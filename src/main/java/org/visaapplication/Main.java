@@ -10,6 +10,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.Date;
@@ -20,19 +22,19 @@ import java.util.Properties;
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
 
-    //    static FileReader reader;
+    static FileReader reader;
     static WebDriver driver;
 
     private static final Logger log = LogManager.getLogger(Main.class);
     private static Date timestamp = new Date();
 
-//    static {
-//        try {
-//            reader = new FileReader("application.properties");
-//        } catch (FileNotFoundException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    static {
+        try {
+            reader = new FileReader("src/main/resources/application.properties");
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     static Properties properties = new Properties();
 
@@ -40,10 +42,9 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
 
-//        properties.load(reader);
+        properties.load(reader);
 
         System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
-//        ChromeDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
 //           options.addArguments("--headless");
         options.addArguments("--remote-allow-origins=*");
@@ -54,9 +55,7 @@ public class Main {
         options.addArguments("start-maximized");
 //        options.addArguments("--disable-extensions");
 //        options.addArguments("-private");
-        options.setExperimentalOption("debuggerAddress","localhost:9222");
-
-//        options.setBinary("C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe");
+        options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(properties.getProperty("port")));
         driver = new ChromeDriver(options);
 
 //        driver.get("https://www.usvisascheduling.com/en-US/");
@@ -64,7 +63,7 @@ public class Main {
 //        driver.findElement(By.xpath("//input[@id='signInName']")).sendKeys("kanikanagori");
 //        driver.findElement(By.xpath("//input[@id='password']")).sendKeys("P@55word");
 
-        LocalDate targetDate = LocalDate.of(2023, 8, 30);
+        LocalDate targetDate = LocalDate.of(2023, 9, 5);
         boolean conditionMet = true;
 
         // Start the application loop
@@ -234,34 +233,117 @@ public class Main {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         WebElement state = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//select[@id='post_select']")));
         Select select = new Select(state);
-        Thread.sleep(4000L);
-        select.selectByVisibleText("NEW DELHI VAC");
-
+        Thread.sleep(Long.parseLong(properties.getProperty("sleepTimeCalendar")));
+        select.selectByVisibleText(properties.getProperty("selectState"));
+        Thread.sleep(Long.parseLong(properties.getProperty("sleepTimeCalendar")));
         WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
-        int numberOfClicks = 20;
-        for (int i = 0; i < numberOfClicks; i++) {
-            state.click();
-            calendar.click();
-            if (driver.findElement(By.xpath("//div[@id='ui-datepicker-div']")).isDisplayed()) {
-                break;
-            }
-        }
+        calendar.click();
+//        int numberOfClicks = 20;
+//        for (int i = 0; i < numberOfClicks; i++) {
+//            state.click();
+//            calendar.click();
+//            if (driver.findElement(By.xpath("//div[@id='ui-datepicker-div']")).isDisplayed()) {
+//                break;
+//            }
+//        }
         selectState();
 
     }
 
     public static void selectState() throws InterruptedException {
 
+        String num = properties.getProperty("num");
+
+        selectDate();
+        WebElement postText = null;
+        try {
+            postText = driver.findElement(By.xpath("//label[contains(text(),'Consular Posts')]"));
+            if (postText.getText().equals("Consular Posts")) {
+                log.log(Level.INFO, "Timestamp: {0}, This is an info TimeStamp." + timestamp);
+                throw new RuntimeException("The Data has been selected from calendar");
+            }
+        } catch (NoSuchElementException ex) {
+            ex.getMessage();
+        }
+
+
+
+        if (num.equals("one")) {
+            driver.quit();
+            ChromeOptions options = new ChromeOptions();
+//           options.addArguments("--headless");
+            options.addArguments("--remote-allow-origins=*");
+            options.addArguments("--ignore-ssl-errors=yes");
+            options.addArguments("--ignore-certificate-errors");
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("start-maximized");
+            options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(properties.getProperty("port")));
+
+            driver = new ChromeDriver(options);
+
+
+           WebElement element= driver.findElement(By.xpath("//label[contains(text(),'')]"));
+           element.click();
+
+            Thread.sleep(Long.parseLong(properties.getProperty("sleepTime")));
+            WebElement blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+            Select select1 = new Select(blankDropDown);
+            select1.selectByVisibleText("");
+            select1.selectByVisibleText(properties.getProperty("selectState"));
+            Thread.sleep(Long.parseLong(properties.getProperty("sleepTime")));
+            WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
+            calendar.click();
+            Thread.sleep(Long.parseLong(properties.getProperty("sleepTimeCalendar")));
+            selectState();
+        } else if (num.equals("two")) {
+            driver.quit();
+            ChromeOptions options = new ChromeOptions();
+//           options.addArguments("--headless");
+            options.addArguments("--remote-allow-origins=*");
+            options.addArguments("--ignore-ssl-errors=yes");
+            options.addArguments("--ignore-certificate-errors");
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("start-maximized");
+            options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(properties.getProperty("port")));
+
+            driver = new ChromeDriver(options);
+            WebElement element= driver.findElement(By.xpath("//label[contains(text(),'')]"));
+            element.click();
+            WebElement blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+            Select select1 = new Select(blankDropDown);
+            select1.selectByVisibleText(properties.getProperty("selectState1"));
+            Thread.sleep(Long.parseLong(properties.getProperty("sleepTime")));
+            WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
+            calendar.click();
+            Thread.sleep(Long.parseLong(properties.getProperty("sleepTimeCalendar")));
+            selectDate();
+            Thread.sleep(Long.parseLong(properties.getProperty("sleepTime")));
+            WebElement element1= driver.findElement(By.xpath("//label[contains(text(),'')]"));
+            element1.click();
+            select1.selectByVisibleText(properties.getProperty("selectState"));
+            Thread.sleep(Long.parseLong(properties.getProperty("sleepTime")));
+            WebElement calendar1 = driver.findElement(By.xpath("//input[@id='datepicker']"));
+            calendar1.click();
+            Thread.sleep(Long.parseLong(properties.getProperty("sleepTimeCalendar")));
+            selectState();
+        }
+
+    }
+
+    public static void selectDate() throws InterruptedException {
+
         WebElement fromYearElement = driver.findElement(By.xpath("//select[@class='ui-datepicker-year']"));
 
         Select selectYear = new Select(fromYearElement);
-        selectYear.selectByVisibleText("2023");
+        selectYear.selectByVisibleText(properties.getProperty("selectYear"));
 
 
         WebElement fromMonthElement = driver.findElement(By.xpath("//select[@class='ui-datepicker-month']"));
 
         Select selectMonth = new Select(fromMonthElement);
-        selectMonth.selectByVisibleText("Sep");
+        selectMonth.selectByVisibleText(properties.getProperty("selectMonth"));
 
         String xpath = "//*[@class='ui-datepicker-calendar']/tbody/tr[";
         String xpath1 = "]/td";
@@ -273,57 +355,37 @@ public class Main {
         for (int i = 1; i < element1.size(); i++) {
             String finalXpath = xpath + i + xpath1;
             List<WebElement> tableDates = driver.findElements(By.xpath(finalXpath));
-            int startDay = 5;
-            for (int j = startDay; j <= element2.size(); j++) {
-                String dateXpath = xpath + i + xpath2 + j + xpath3;
+//            for (int j = startDay; j <= element2.size(); j++) {
+//                String dateXpath = xpath + i + xpath2 + j + xpath3;
 
-                List<WebElement> dateFinalXpath = driver.findElements(By.xpath(dateXpath));
+//                List<WebElement> dateFinalXpath = driver.findElements(By.xpath(dateXpath));
 
-                for (WebElement dates : dateFinalXpath) {
+//                for (WebElement dates : dateFinalXpath) {
 
-                    String dateText = dates.getText();
-                    if (dateText.equals(null) || dateText.equals(" ")) {
-                        continue;
-                    } else {
-                    int endDay = 15;
-                        for (WebElement date : tableDates) {
-                    for (int day = Integer.parseInt(dateText); day <= 15; day++) {
+//                    String dateText = dates.getText();
+//                    if (dateText.equals(null) || dateText.equals(" ")) {
+//                        continue;
+//                    } else {
+            for (WebElement date : tableDates) {
+//                            for (int day = Integer.parseInt(properties.getProperty("startDay")); day <= Integer.parseInt(properties.getProperty("endDay")); day++) {
 
 
+                // Find the cell for the current day
+                if (date.getAttribute("class").equals(" greenday")) {
 
-                            // Find the cell for the current day
-                            if (date.getAttribute("class").equals(" greenday")) {
-
-                                log.log(Level.INFO, "Timestamp: {0}, This is an info TimeStamp." + timestamp);
-                                date.click();
-                                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                                WebElement radioElement = wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//input[@type='radio']"))));
-                                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                                jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
-                                jsExecutor.executeScript("arguments[0].click();", radioElement);
-//                        driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                                break outerLoop;
-                            } else {
-                                continue;
-                            }
-                        }
-
-                        WebElement blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
-                        WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
-
-                        Select select1 = new Select(blankDropDown);
-                        select1.selectByVisibleText("HYDERABAD VAC");
-                        JavascriptExecutor js = (JavascriptExecutor) driver;
-                        js.executeScript("document.getElementById('ui-datepicker-div').style.display = 'none';"); // Replace with actual popup ID
-                        select1.selectByVisibleText("NEW DELHI VAC");
-                        js.executeScript("document.getElementById('ui-datepicker-div').style.display = 'block';");
-                        js.executeScript("document.getElementById('datepicker').click();");
-                        selectState();
-                    }
+                    log.log(Level.INFO, "Timestamp: {0}, This is an info TimeStamp." + timestamp);
+                    date.click();
+                    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                    WebElement radioElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
+                    JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                    jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
+                    jsExecutor.executeScript("arguments[0].click();", radioElement);
+//                    driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
+                    break outerLoop;
+                } else {
+                    continue;
                 }
             }
         }
-    }}}
-
-
-
+    }
+}
