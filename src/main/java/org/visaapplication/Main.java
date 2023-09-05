@@ -7,9 +7,12 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -22,6 +25,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.*;
@@ -33,6 +38,8 @@ public class Main implements CommandLineRunner {
 
     static FileReader reader;
     static WebDriver driver;
+
+    static EdgeDriver edgedriver;
 
     private static final Logger log = LogManager.getLogger(Main.class);
     private static Date timestamp = new Date();
@@ -55,16 +62,15 @@ public class Main implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        try {
+            properties.load(reader);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         TimerTask task = new TimerTask() {
 
             public void run() {
-
-                try {
-                    properties.load(reader);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
 
                 if(properties.getProperty("browser").equals("chrome")) {
                     openChromeBrowser();
@@ -72,26 +78,11 @@ public class Main implements CommandLineRunner {
                     openFireFoxBrowser();
                 } else {
                     openEdgeBrowser();
+
                 }
 
-//                if (properties.getProperty("os").equals("windows")) {
-//                    System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
-//                } else {
-//                    System.setProperty("webdriver.chrome.driver", "mac/chromedriver");
-//                }
-//                ChromeOptions options = new ChromeOptions();
-//                options.addArguments("--remote-allow-origins=*");
-//                options.addArguments("--ignore-ssl-errors=yes");
-//                options.addArguments("--ignore-certificate-errors");
-//                options.addArguments("--no-sandbox");
-//                options.addArguments("--disable-dev-shm-usage");
-//                options.addArguments("start-maximized");
-//
-//                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(properties.getProperty("port")));
-//                driver = new ChromeDriver(options);
 
-
-                LocalDate targetDate = LocalDate.of(2023, 9, 5);
+                LocalDate targetDate = LocalDate.of(2023, 9, 30);
                 boolean conditionMet = true;
 
                 // Start the application loop
@@ -142,7 +133,7 @@ public class Main implements CommandLineRunner {
             }
         };
         Timer timer = new Timer();
-        timer.schedule(task, 0, 1000);
+        timer.schedule(task, 0, Long.parseLong(properties.getProperty("schedulerTime")));
     }
 
     public static void selectState() throws InterruptedException {
@@ -247,7 +238,7 @@ public class Main implements CommandLineRunner {
                 options.addArguments("--disable-dev-shm-usage");
                 options.addArguments("start-maximized");
 
-                options.addArguments("--start-debugger-server", "localhost:" + Integer.parseInt(properties.getProperty("port")));
+                options.addArguments("debuggerAddress", "localhost:" + Integer.parseInt(properties.getProperty("port")));
                 driver = new EdgeDriver(options);
             }
             WebElement element= driver.findElement(By.xpath("//label[contains(text(),'')]"));
@@ -319,7 +310,7 @@ public class Main implements CommandLineRunner {
             String finalXpath = xpath + i + xpath1;
             List<WebElement> tableDates = driver.findElements(By.xpath(finalXpath));
             for (WebElement date : tableDates) {
-                if (date.getAttribute("class").equals(" greenday")) {
+                if (date.getAttribute("class").equals(" greenday") || date.getAttribute("class").equals(" ui-datepicker-week-end greenday")) {
                     log.log(Level.INFO, "Timestamp: {0}, This is an info TimeStamp." + timestamp);
                     log.log(Level.INFO, "Date: {0}, This Date is selected." + date.getText());
                     date.click();
@@ -328,8 +319,8 @@ public class Main implements CommandLineRunner {
                     JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
                     jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                     jsExecutor.executeScript("arguments[0].click();", radioElement);
-                    playAudio("file_example_WAV_1MG.wav");
                     driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
+                    playAudio("file_example_WAV_1MG.wav");
                     throw new RuntimeException("The Date has been selected");
                 } else {
                     continue;
@@ -340,6 +331,7 @@ public class Main implements CommandLineRunner {
 
     public static void openChromeBrowser() {
         if (properties.getProperty("os").equals("windows")) {
+
             System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
         } else {
             System.setProperty("webdriver.chrome.driver", "mac/chromedriver");
@@ -360,26 +352,27 @@ public class Main implements CommandLineRunner {
         if (properties.getProperty("os").equals("windows")) {
             System.setProperty("webdriver.gecko.driver", "geckodriver.exe");
         } else {
-            System.setProperty("webdriver.chrome.driver", "mac/geckodriver");
+            System.setProperty("webdriver.gecko.driver", "mac/geckodriver");
         }
         FirefoxOptions options = new FirefoxOptions();
-        options.addArguments("--remote-allow-origins=*");
-        options.addArguments("--ignore-ssl-errors=yes");
-        options.addArguments("--ignore-certificate-errors");
+//        options.addArguments("--remote-allow-origins=*");
+//        options.addArguments("--ignore-ssl-errors=yes");
+//        options.addArguments("--ignore-certificate-errors");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("start-maximized");
-
-        options.addArguments("--start-debugger-server", "localhost:" + Integer.parseInt(properties.getProperty("port")));
-        driver = new FirefoxDriver(options);
+        options.setCapability("moz:debuggerAddress", "localhost:9222");
+//        options.addArguments("debuggerAddress", "localhost:" + Integer.parseInt(properties.getProperty("port")));
+        driver = new RemoteWebDriver(options);
     }
 
-    public static void openEdgeBrowser(){
+    public static void openEdgeBrowser() {
         if (properties.getProperty("os").equals("windows")) {
-            System.setProperty("webdriver.gecko.driver", "msedgedriver.exe");
+            System.setProperty("webdriver.edge.driver", "msedgedriver.exe");
         } else {
             System.setProperty("webdriver.edge.driver", "mac/msedgedriver");
         }
+
         EdgeOptions options = new EdgeOptions();
         options.addArguments("--remote-allow-origins=*");
         options.addArguments("--ignore-ssl-errors=yes");
@@ -387,8 +380,9 @@ public class Main implements CommandLineRunner {
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("start-maximized");
-
-        options.addArguments("--start-debugger-server", "localhost:" + Integer.parseInt(properties.getProperty("port")));
+//        options.setCapability("browserName","webview2");
+        options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(properties.getProperty("port")));
+        // Create a RemoteWebDriver instance by attaching to the existing session
         driver = new EdgeDriver(options);
     }
 
