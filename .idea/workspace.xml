@@ -5,12 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cebfe447-50ed-4d2d-8e17-d3d41dcf321a" name="Changes" comment="fixed the issue driver issue">
-      <change afterPath="$PROJECT_DIR$/geckodriver.exe" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mac/geckodriver" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mac/msedgedriver" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/msedgedriver.exe" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test.exe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/remove.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mac/chromedriver" beforeDir="false" afterPath="$PROJECT_DIR$/mac/chromedriver" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
@@ -41,7 +40,7 @@
     "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "C:/Users/pc/Documents/VisaApplication/mac",
     "onboarding.tips.debug.path": "C:/Users/pc/Documents/VisaApplication/src/main/java/org/visaapplication/Main.java",
-    "project.structure.last.edited": "Project",
+    "project.structure.last.edited": "SDKs",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2"
   }
@@ -53,6 +52,7 @@
       <recent name="C:\Users\pc\Documents\VisaApplication\tessData" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\pc\Documents\VisaApplication" />
       <recent name="C:\Users\pc\Documents\VisaApplication\mac" />
       <recent name="C:\Users\pc\Documents\VisaApplication\src\main\resources" />
       <recent name="C:\Users\pc\Documents\VisaApplication\src\main\proguard" />
@@ -108,12 +108,30 @@
       <option name="project" value="LOCAL" />
       <updated>1693245653481</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="fixed the issue driver issue">
+      <created>1693934997069</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1693934997069</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="implemented the script directly run from 3rd page" />
     <MESSAGE value="fixed the issue driver issue" />
     <option name="LAST_COMMIT_MESSAGE" value="fixed the issue driver issue" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>799</line>
+          <option name="timeStamp" value="56" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
