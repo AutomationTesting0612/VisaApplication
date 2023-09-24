@@ -25,7 +25,6 @@ import org.testng.annotations.Parameters;
 
 import javax.sound.sampled.*;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -37,11 +36,7 @@ import java.util.TimerTask;
 @SpringBootApplication
 @PropertySource("file:application.properties")
 public class Main implements CommandLineRunner {
-
-     FileReader reader;
      WebDriver driver;
-
-     EdgeDriver edgedriver;
 
     private final Logger log = LogManager.getLogger(Main.class);
     private Date timestamp = new Date();
@@ -113,6 +108,15 @@ public class Main implements CommandLineRunner {
 
     @Value("${interviewState1:}")
     private String interviewState1;
+
+    @Value("${interviewState2:}")
+    private String interviewState2;
+
+    @Value("${interviewState3:}")
+    private String interviewState3;
+
+    @Value("${interviewState4:}")
+    private String interviewState4;
 
     @Value("${CounselorPageTimeCalendar:}")
     private String CounselorPageTimeCalendar;
@@ -878,7 +882,6 @@ public class Main implements CommandLineRunner {
                     while (selectDataMet1) {
                         WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                         String selectedDate = calendar.getAttribute("value");
-                        // Compare the current date with the target date
                         if (selectedDate.equals("Select Date")) {
                             calendar.click();
                             selectDataMet1 = false;
@@ -890,7 +893,6 @@ public class Main implements CommandLineRunner {
                 }
             }
             catch (NoSuchElementException exception) {
-                // The date was not found in the calendar. Continue to the next date.
                 exception.getMessage();
             }
             catch (InterruptedException e) {
@@ -928,6 +930,7 @@ public class Main implements CommandLineRunner {
             boolean selectDataMet = true;
 
             while (selectDataMet) {
+                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
                 select1.selectByVisibleText(interviewState);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
@@ -939,7 +942,6 @@ public class Main implements CommandLineRunner {
                     selectDataMet = false;
                 } else {
                     select1.selectByVisibleText(interviewState1);
-                    Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
                     selectDataMet = true;
                 }
             }
@@ -959,15 +961,17 @@ public class Main implements CommandLineRunner {
                 EdgeOptions options = new EdgeOptions();
                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
                 driver = new EdgeDriver(options);           }
-            WebElement element = driver.findElement(By.xpath("//label[contains(text(),'')]"));
+            WebElement element = driver.findElement
+                    (By.xpath("//label[contains(text(),'')]"));
             element.click();
             WebElement blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
             Select select1 = new Select(blankDropDown);
-            select1.selectByVisibleText(selectState1);
             selectedState = select1.getFirstSelectedOption();
             boolean selectDataMet = true;
 
             while (selectDataMet) {
+                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
+                select1.selectByVisibleText(interviewState);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
 
@@ -983,11 +987,12 @@ public class Main implements CommandLineRunner {
 
             WebElement element1 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element1.click();
-            select1.selectByVisibleText(selectState);
             selectedState = select1.getFirstSelectedOption();
             boolean selectDataMet1 = true;
 
             while (selectDataMet1) {
+                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
+                select1.selectByVisibleText(interviewState1);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
                 if (selectedDate.equals("Select Date")) {
@@ -1019,11 +1024,12 @@ public class Main implements CommandLineRunner {
             element.click();
             WebElement blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
             Select select1 = new Select(blankDropDown);
-            select1.selectByVisibleText(selectState1);
             selectedState = select1.getFirstSelectedOption();
             boolean selectDataMet = true;
 
             while (selectDataMet) {
+                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
+                select1.selectByVisibleText(interviewState);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
 
@@ -1042,11 +1048,12 @@ public class Main implements CommandLineRunner {
             element3.click();
             WebElement blankDropDown3 = driver.findElement(By.xpath("//select[@id='post_select']"));
             Select select3 = new Select(blankDropDown3);
-            select3.selectByVisibleText(selectState2);
             selectedState = select3.getFirstSelectedOption();
             boolean selectDataMet3 = true;
 
             while (selectDataMet3) {
+                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
+                select1.selectByVisibleText(interviewState1);
                 WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate3 = calendar3.getAttribute("value");
 
@@ -1065,11 +1072,12 @@ public class Main implements CommandLineRunner {
             element4.click();
             WebElement blankDropDown4 = driver.findElement(By.xpath("//select[@id='post_select']"));
             Select select4 = new Select(blankDropDown4);
-            select4.selectByVisibleText(selectState3);
             selectedState = select4.getFirstSelectedOption();
             boolean selectDataMet4 = true;
 
             while (selectDataMet4) {
+                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
+                select1.selectByVisibleText(interviewState2);
                 WebElement calendar4 = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate4 = calendar4.getAttribute("value");
 
@@ -1088,11 +1096,12 @@ public class Main implements CommandLineRunner {
             element5.click();
             WebElement blankDropDown5 = driver.findElement(By.xpath("//select[@id='post_select']"));
             Select select5 = new Select(blankDropDown5);
-            select5.selectByVisibleText(selectState4);
             selectedState = select5.getFirstSelectedOption();
             boolean selectDataMet5 = true;
 
             while (selectDataMet5) {
+                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
+                select1.selectByVisibleText(interviewState3);
                 WebElement calendar5 = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate5 = calendar5.getAttribute("value");
 
@@ -1108,11 +1117,12 @@ public class Main implements CommandLineRunner {
 
             WebElement element1 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element1.click();
-            select1.selectByVisibleText(selectState);
             selectedState = select1.getFirstSelectedOption();
             boolean selectDataMet1 = true;
 
             while (selectDataMet1) {
+                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
+                select1.selectByVisibleText(interviewState4);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
                 // Compare the current date with the target date
@@ -1145,11 +1155,12 @@ public class Main implements CommandLineRunner {
             element.click();
             WebElement blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
             Select select1 = new Select(blankDropDown);
-            select1.selectByVisibleText(selectState1);
             selectedState = select1.getFirstSelectedOption();
             boolean selectDataMet = true;
 
             while (selectDataMet) {
+                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
+                select1.selectByVisibleText(interviewState);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
 
@@ -1168,11 +1179,12 @@ public class Main implements CommandLineRunner {
             element3.click();
             WebElement blankDropDown3 = driver.findElement(By.xpath("//select[@id='post_select']"));
             Select select3 = new Select(blankDropDown3);
-            select3.selectByVisibleText(selectState2);
             selectedState = select3.getFirstSelectedOption();
             boolean selectDataMet3 = true;
 
             while (selectDataMet3) {
+                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
+                select1.selectByVisibleText(interviewState1);
                 WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate3 = calendar3.getAttribute("value");
 
@@ -1191,11 +1203,12 @@ public class Main implements CommandLineRunner {
             element4.click();
             WebElement blankDropDown4 = driver.findElement(By.xpath("//select[@id='post_select']"));
             Select select4 = new Select(blankDropDown4);
-            select4.selectByVisibleText(selectState3);
             selectedState = select4.getFirstSelectedOption();
             boolean selectDataMet4 = true;
 
             while (selectDataMet4) {
+                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
+                select1.selectByVisibleText(interviewState2);
                 WebElement calendar4 = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate4 = calendar4.getAttribute("value");
 
@@ -1211,11 +1224,12 @@ public class Main implements CommandLineRunner {
 
             WebElement element1 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element1.click();
-            select1.selectByVisibleText(selectState);
             selectedState = select1.getFirstSelectedOption();
             boolean selectDataMet1 = true;
 
             while (selectDataMet1) {
+                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
+                select1.selectByVisibleText(interviewState3);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
                 // Compare the current date with the target date
@@ -1248,11 +1262,12 @@ public class Main implements CommandLineRunner {
             element.click();
             WebElement blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
             Select select1 = new Select(blankDropDown);
-            select1.selectByVisibleText(selectState1);
             selectedState = select1.getFirstSelectedOption();
             boolean selectDataMet = true;
 
             while (selectDataMet) {
+                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
+                select1.selectByVisibleText(interviewState);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
 
@@ -1276,6 +1291,8 @@ public class Main implements CommandLineRunner {
             boolean selectDataMet3 = true;
 
             while (selectDataMet3) {
+                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
+                select1.selectByVisibleText(interviewState1);
                 WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate3 = calendar3.getAttribute("value");
 
@@ -1296,6 +1313,8 @@ public class Main implements CommandLineRunner {
             boolean selectDataMet1 = true;
 
             while (selectDataMet1) {
+                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
+                select1.selectByVisibleText(interviewState2);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
                 // Compare the current date with the target date
@@ -1544,6 +1563,7 @@ public class Main implements CommandLineRunner {
             }
             if(dateElement==null) {
                 selectStateConsularPosts();
+
             }
         } else if(fromDate< toDate && !fromMonth.equals(toMonth)) {
             WebElement dateElement=null;
@@ -1582,12 +1602,18 @@ public class Main implements CommandLineRunner {
                         }
                         continue;
                     }
+
                 } catch (NoSuchElementException exception) {
                     // The date was not found in the calendar. Continue to the next date.
                     exception.getMessage();
                 }
             }
+            if(dateElement==null) {
+                selectStateConsularPosts();
+
+            }
         }
+
     }
 
     public void toDateRangeInterviewPage() throws InterruptedException {

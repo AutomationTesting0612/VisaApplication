@@ -5,18 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cebfe447-50ed-4d2d-8e17-d3d41dcf321a" name="Changes" comment="fixed the issue driver issue">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/application-brave.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/application-chrome.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/application-chromium.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/application-edge.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chromedriver.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/msedgedriver.exe" beforeDir="false" afterPath="$PROJECT_DIR$/msedgedriver.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/remove.exe" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.exe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application-chrome.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application-chrome.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,7 +127,14 @@
       <option name="project" value="LOCAL" />
       <updated>1695003026522</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="fixed the issue driver issue">
+      <created>1695257862483</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1695257862483</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -149,44 +147,23 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>717</line>
-          <option name="timeStamp" value="101" />
+          <line>1357</line>
+          <option name="timeStamp" value="120" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>722</line>
-          <option name="timeStamp" value="102" />
+          <line>1512</line>
+          <option name="timeStamp" value="130" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>542</line>
-          <option name="timeStamp" value="103" />
+          <line>1556</line>
+          <option name="timeStamp" value="131" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>1417</line>
-          <option name="timeStamp" value="109" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>1468</line>
-          <option name="timeStamp" value="110" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>1462</line>
-          <option name="timeStamp" value="111" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>1517</line>
-          <option name="timeStamp" value="112" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-field">
-          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>55</line>
-          <properties field="browser" class="org.visaapplication.Main" />
-          <option name="timeStamp" value="107" />
+          <line>1601</line>
+          <option name="timeStamp" value="132" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
