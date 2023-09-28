@@ -65,35 +65,11 @@ public class Main implements CommandLineRunner {
     @Value("${toSelectMonth:}")
     private String toSelectMonth;
 
-    @Value("${secondSelectMonth:}")
-    private String secondSelectMonth;
-
-    @Value("${thirdSelectMonth:}")
-    private String thirdSelectMonth;
-
-    @Value("${fourthSelectMonth:}")
-    private String fourthSelectMonth;
-
-    @Value("${fifthSelectMonth:}")
-    private String fifthSelectMonth;
-
     @Value("${toSelectYear:}")
     private String toSelectYear;
 
     @Value("${selectMonthDigitRange:}")
     private String selectMonthDigitRange;
-
-    @Value("${secondMonthDigitRange:}")
-    private String secondMonthDigitRange;
-
-    @Value("${thirdMonthDigitRange:}")
-    private String thirdMonthDigitRange;
-
-    @Value("${fourthMonthDigitRange:}")
-    private String fourthMonthDigitRange;
-
-    @Value("${fifthMonthDigitRange:}")
-    private String fifthMonthDigitRange;
 
     @Value("${toSelectMonthDigitRange:}")
     private String toSelectMonthDigitRange;
@@ -119,6 +95,9 @@ public class Main implements CommandLineRunner {
     @Value("${sleepTimeCalendar:}")
     private String sleepTimeCalendar;
 
+    @Value("${stateSleepTimeCalendar:}")
+    private String stateSleepTimeCalendar;
+
     @Value("${schedulerTime:}")
     private String schedulerTime;
 
@@ -140,9 +119,6 @@ public class Main implements CommandLineRunner {
 
     @Value("${interviewState4:}")
     private String interviewState4;
-
-    @Value("${CounselorPageTimeCalendar:}")
-    private String CounselorPageTimeCalendar;
 
 
 //     Properties properties = new Properties();
@@ -384,7 +360,6 @@ public class Main implements CommandLineRunner {
             }
             Thread.sleep(Long.parseLong(sleepTimeCalendar));
             selectDate();
-
             //fourth state
             WebElement element4 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element4.click();
@@ -510,7 +485,6 @@ public class Main implements CommandLineRunner {
         }
         Thread.sleep(Long.parseLong(sleepTimeCalendar));
         selectDate();
-
         //fourth state
         WebElement element4 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
         element4.click();
@@ -534,25 +508,25 @@ public class Main implements CommandLineRunner {
         Thread.sleep(Long.parseLong(sleepTimeCalendar));
         selectDate();
 
-            WebElement element1 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
-            element1.click();
-            select1.selectByVisibleText(selectState);
-            selectedState = select1.getFirstSelectedOption();
-            boolean selectDataMet1 = true;
+        WebElement element1 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
+        element1.click();
+        select1.selectByVisibleText(selectState);
+        selectedState = select1.getFirstSelectedOption();
+        boolean selectDataMet1 = true;
 
-            while (selectDataMet1) {
-                WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate = calendar.getAttribute("value");
-                // Compare the current date with the target date
-                if (selectedDate.equals("Select Date")) {
-                    calendar.click();
-                    selectDataMet1 = false;
-                } else {
-                    selectDataMet1 = true;
-                }
+        while (selectDataMet1) {
+            WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
+            String selectedDate = calendar.getAttribute("value");
+            // Compare the current date with the target date
+            if (selectedDate.equals("Select Date")) {
+                calendar.click();
+                selectDataMet1 = false;
+            } else {
+                selectDataMet1 = true;
             }
-            Thread.sleep(Long.parseLong(sleepTimeCalendar));
-            selectDate();
+        }
+        Thread.sleep(Long.parseLong(sleepTimeCalendar));
+        selectDate();
     } else if (switchLocation.equals("three")) {
             driver.quit();
             if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
@@ -720,12 +694,10 @@ public class Main implements CommandLineRunner {
 
             dateRange();
 
+            //Click next Month Element
             WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonth = new Select(secondElement);
-            secondMonth.selectByVisibleText(secondSelectMonth);
-
-            completeMonth();
+            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            secondElement.click();
 
             WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
             WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
@@ -741,17 +713,17 @@ public class Main implements CommandLineRunner {
 
             dateRange();
 
+            //Click next Month Element
             WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonth = new Select(secondElement);
-            secondMonth.selectByVisibleText(secondSelectMonth);
+            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            secondElement.click();
 
             completeMonth();
 
+            //Click next Month Element
             WebDriverWait thirdMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select thirdMonth = new Select(thirdElement);
-            thirdMonth.selectByVisibleText(thirdSelectMonth);
+            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            thirdElement.click();
 
             completeThirdMonth();
 
@@ -769,26 +741,24 @@ public class Main implements CommandLineRunner {
 
             dateRange();
 
+            //Click next Month Element
             WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonth = new Select(secondElement);
-            secondMonth.selectByVisibleText(secondSelectMonth);
+            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            secondElement.click();
 
             completeMonth();
 
+            //Click next Month Element
             WebDriverWait thirdMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select thirdMonth = new Select(thirdElement);
-            thirdMonth.selectByVisibleText(thirdSelectMonth);
+            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            thirdElement.click();
 
             completeThirdMonth();
 
+            //Click next Month Element
             WebDriverWait fourthMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement fourthElement = fourthMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select fourthMonth = new Select(fourthElement);
-            fourthMonth.selectByVisibleText(fourthSelectMonth);
-
-            completeFourthMonth();
+            WebElement fourthElement = fourthMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            fourthElement.click();
 
             WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
             WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
@@ -809,12 +779,19 @@ public class Main implements CommandLineRunner {
 
             dateRange();
 
+            //Click next Month Element
             WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonth = new Select(secondElement);
-            secondMonth.selectByVisibleText(secondSelectMonth);
+            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            secondElement.click();
 
-            if (!secondSelectMonth.equals("Dec")) {
+            WebDriverWait secondMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement second = secondMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            Select secondMonths = new Select(second);
+            WebElement textElement = secondMonths.getFirstSelectedOption();
+            String validateMonthElement = textElement.getText();
+
+
+            if (!validateMonthElement.equals("Dec")) {
                 WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
                 WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
                 Select NextYear = new Select(nextYearElement);
@@ -847,25 +824,38 @@ public class Main implements CommandLineRunner {
 
             dateRange();
 
+            //Click next Month Element
             WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonth = new Select(secondElement);
-            secondMonth.selectByVisibleText(secondSelectMonth);
+            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            secondElement.click();
 
-            if (!secondSelectMonth.equals("Nov")) {
+            WebDriverWait secondMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement second = secondMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            Select secondMonths = new Select(second);
+            WebElement textElement = secondMonths.getFirstSelectedOption();
+            String validateMonthElement = textElement.getText();
+
+            if (!validateMonthElement.equals("Nov")) {
                 WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
                 WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
                 Select NextYear = new Select(nextYearElement);
                 NextYear.selectByVisibleText(toSelectYear);
             }
+
             completeMonth();
 
             WebDriverWait thirdMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select thirdMonth = new Select(thirdElement);
-            thirdMonth.selectByVisibleText(thirdSelectMonth);
+            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            thirdElement.click();
 
-            if (!thirdSelectMonth.equals("Dec")) {
+            WebDriverWait thirdMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement third = thirdMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            Select thirdMonths = new Select(third);
+            WebElement thirdTextElement = thirdMonths.getFirstSelectedOption();
+            String validateThirdMonthElement = thirdTextElement.getText();
+
+
+            if (!validateThirdMonthElement.equals("Nov")) {
                 WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
                 WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
                 Select NextYear = new Select(nextYearElement);
@@ -898,12 +888,19 @@ public class Main implements CommandLineRunner {
 
             dateRange();
 
+            //Click next Month Element
             WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonth = new Select(secondElement);
-            secondMonth.selectByVisibleText(secondSelectMonth);
+            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            secondElement.click();
 
-            if (!secondSelectMonth.equals("Oct")) {
+            WebDriverWait secondMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement second = secondMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            Select secondMonths = new Select(second);
+            WebElement textElement = secondMonths.getFirstSelectedOption();
+            String validateMonthElement = textElement.getText();
+
+
+            if (!validateMonthElement.equals("Oct")) {
                 WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
                 WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
                 Select NextYear = new Select(nextYearElement);
@@ -913,11 +910,17 @@ public class Main implements CommandLineRunner {
             completeMonth();
 
             WebDriverWait thirdMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select thirdMonth = new Select(thirdElement);
-            thirdMonth.selectByVisibleText(thirdSelectMonth);
+            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            thirdElement.click();
 
-            if (!thirdSelectMonth.equals("Nov")) {
+            WebDriverWait thirdMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement third = thirdMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            Select thirdMonths = new Select(third);
+            WebElement thirdTextElement = thirdMonths.getFirstSelectedOption();
+            String validateThirdMonthElement = thirdTextElement.getText();
+
+
+            if (!validateThirdMonthElement.equals("Nov")) {
                 WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
                 WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
                 Select NextYear = new Select(nextYearElement);
@@ -927,11 +930,17 @@ public class Main implements CommandLineRunner {
             completeThirdMonth();
 
             WebDriverWait fourthMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement fourthElement = fourthMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select fourthMonth = new Select(fourthElement);
-            fourthMonth.selectByVisibleText(fourthSelectMonth);
+            WebElement fourthElement = fourthMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            fourthElement.click();
 
-            if (!fourthSelectMonth.equals("Dec")) {
+            WebDriverWait fourthMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement fourth = fourthMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            Select fourthMonths = new Select(fourth);
+            WebElement fourthTextElement = fourthMonths.getFirstSelectedOption();
+            String validateFourthMonthElement = fourthTextElement.getText();
+
+
+            if (!validateFourthMonthElement.equals("Dec")) {
                 WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
                 WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
                 Select NextYear = new Select(nextYearElement);
@@ -1119,7 +1128,16 @@ public class Main implements CommandLineRunner {
     }
 
     public void completeMonth() {
-        LocalDate endDate = LocalDate.of(Integer.parseInt(toSelectYear), Integer.parseInt(secondMonthDigitRange), Integer.parseInt(toDay));
+        WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
+        String monthElement = secondElement.getAttribute("value");
+
+        WebDriverWait secondYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondYearElement = secondYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
+        String yearElement = secondYearElement.getAttribute("value");
+
+
+        LocalDate endDate = LocalDate.of(Integer.parseInt(yearElement), Integer.parseInt(monthElement)+1, Integer.parseInt(toDay));
         int endDay = endDate.lengthOfMonth();
 
             for (int date = 1; date <= endDay; date++) {
@@ -1151,7 +1169,16 @@ public class Main implements CommandLineRunner {
     }
 
     public void completeMonthForInterviewPage() {
-        LocalDate endDate = LocalDate.of(Integer.parseInt(toSelectYear), Integer.parseInt(secondMonthDigitRange), Integer.parseInt(toDay));
+
+        WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
+        String monthElement = secondElement.getAttribute("value");
+
+        WebDriverWait secondYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondYearElement = secondYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
+        String yearElement = secondYearElement.getAttribute("value");
+
+        LocalDate endDate = LocalDate.of(Integer.parseInt(yearElement), Integer.parseInt(monthElement)+1, Integer.parseInt(toDay));
         int endDay = endDate.lengthOfMonth();
 
         for (int date = 1; date <= endDay; date++) {
@@ -1180,7 +1207,15 @@ public class Main implements CommandLineRunner {
     }
 
     public void completeThirdMonth() {
-        LocalDate endDate = LocalDate.of(Integer.parseInt(toSelectYear), Integer.parseInt(thirdMonthDigitRange), Integer.parseInt(toDay));
+        WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
+        String monthElement = secondElement.getAttribute("value");
+
+        WebDriverWait secondYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondYearElement = secondYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
+        String yearElement = secondYearElement.getAttribute("value");
+
+        LocalDate endDate = LocalDate.of(Integer.parseInt(yearElement), Integer.parseInt(monthElement)+1, Integer.parseInt(toDay));
         int endDay = endDate.lengthOfMonth();
 
         for (int date = 1; date <= endDay; date++) {
@@ -1212,7 +1247,17 @@ public class Main implements CommandLineRunner {
     }
 
     public void completeThirdMonthForInterviewPage() {
-        LocalDate endDate = LocalDate.of(Integer.parseInt(toSelectYear), Integer.parseInt(thirdMonthDigitRange), Integer.parseInt(toDay));
+
+        WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
+        String monthElement = secondElement.getAttribute("value");
+
+        WebDriverWait secondYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondYearElement = secondYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
+        String yearElement = secondYearElement.getAttribute("value");
+
+
+        LocalDate endDate = LocalDate.of(Integer.parseInt(yearElement), Integer.parseInt(monthElement)+1, Integer.parseInt(toDay));
         int endDay = endDate.lengthOfMonth();
 
         for (int date = 1; date <= endDay; date++) {
@@ -1241,7 +1286,16 @@ public class Main implements CommandLineRunner {
     }
 
     public void completeFourthMonth() {
-        LocalDate endDate = LocalDate.of(Integer.parseInt(toSelectYear), Integer.parseInt(fourthMonthDigitRange), Integer.parseInt(toDay));
+
+        WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
+        String monthElement = secondElement.getAttribute("value");
+
+        WebDriverWait secondYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondYearElement = secondYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
+        String yearElement = secondYearElement.getAttribute("value");
+
+        LocalDate endDate = LocalDate.of(Integer.parseInt(yearElement), Integer.parseInt(monthElement)+1, Integer.parseInt(toDay));
         int endDay = endDate.lengthOfMonth();
 
         for (int date = 1; date <= endDay; date++) {
@@ -1273,7 +1327,16 @@ public class Main implements CommandLineRunner {
     }
 
     public void completeFourthMonthForInterviewPage() {
-        LocalDate endDate = LocalDate.of(Integer.parseInt(toSelectYear), Integer.parseInt(fourthMonthDigitRange), Integer.parseInt(toDay));
+
+        WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
+        String monthElement = secondElement.getAttribute("value");
+
+        WebDriverWait secondYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondYearElement = secondYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
+        String yearElement = secondYearElement.getAttribute("value");
+
+        LocalDate endDate = LocalDate.of(Integer.parseInt(yearElement), Integer.parseInt(monthElement)+1, Integer.parseInt(toDay));
         int endDay = endDate.lengthOfMonth();
 
         for (int date = 1; date <= endDay; date++) {
@@ -1302,7 +1365,16 @@ public class Main implements CommandLineRunner {
     }
 
     public void completeFifthMonth() {
-        LocalDate endDate = LocalDate.of(Integer.parseInt(toSelectYear), Integer.parseInt(fifthMonthDigitRange), Integer.parseInt(toDay));
+
+        WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
+        String monthElement = secondElement.getAttribute("value");
+
+        WebDriverWait secondYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondYearElement = secondYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
+        String yearElement = secondYearElement.getAttribute("value");
+
+        LocalDate endDate = LocalDate.of(Integer.parseInt(yearElement), Integer.parseInt(monthElement)+1, Integer.parseInt(toDay));
         int endDay = endDate.lengthOfMonth();
 
         for (int date = 1; date <= endDay; date++) {
@@ -1399,6 +1471,9 @@ public class Main implements CommandLineRunner {
                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
                 driver = new EdgeDriver(options);
             }
+
+            Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
+
             WebElement element = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element.click();
             WebElement blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
@@ -1408,7 +1483,6 @@ public class Main implements CommandLineRunner {
             boolean selectDataMet = true;
 
             while (selectDataMet) {
-                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
                 select1.selectByVisibleText(interviewState);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
@@ -1439,6 +1513,9 @@ public class Main implements CommandLineRunner {
                 EdgeOptions options = new EdgeOptions();
                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
                 driver = new EdgeDriver(options);           }
+
+            Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
+
             WebElement element = driver.findElement
                     (By.xpath("//label[contains(text(),'')]"));
             element.click();
@@ -1448,7 +1525,6 @@ public class Main implements CommandLineRunner {
             boolean selectDataMet = true;
 
             while (selectDataMet) {
-                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
                 select1.selectByVisibleText(interviewState);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
@@ -1463,13 +1539,14 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(sleepTimeCalendar));
             selectDateInterviewPage();
 
+            Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
+
             WebElement element1 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element1.click();
             selectedState = select1.getFirstSelectedOption();
             boolean selectDataMet1 = true;
 
             while (selectDataMet1) {
-                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
                 select1.selectByVisibleText(interviewState1);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
@@ -1497,6 +1574,8 @@ public class Main implements CommandLineRunner {
                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
                 driver = new EdgeDriver(options);
             }
+
+            Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
             //second state
             WebElement element = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element.click();
@@ -1506,7 +1585,6 @@ public class Main implements CommandLineRunner {
             boolean selectDataMet = true;
 
             while (selectDataMet) {
-                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
                 select1.selectByVisibleText(interviewState);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
@@ -1521,6 +1599,8 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(sleepTimeCalendar));
             selectDateInterviewPage();
 
+            Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
+
             //Third state
             WebElement element3 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element3.click();
@@ -1530,7 +1610,7 @@ public class Main implements CommandLineRunner {
             boolean selectDataMet3 = true;
 
             while (selectDataMet3) {
-                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
+
                 select1.selectByVisibleText(interviewState1);
                 WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate3 = calendar3.getAttribute("value");
@@ -1545,6 +1625,8 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(sleepTimeCalendar));
             selectDateInterviewPage();
 
+            Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
+
             //fourth state
             WebElement element4 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element4.click();
@@ -1554,7 +1636,6 @@ public class Main implements CommandLineRunner {
             boolean selectDataMet4 = true;
 
             while (selectDataMet4) {
-                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
                 select1.selectByVisibleText(interviewState2);
                 WebElement calendar4 = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate4 = calendar4.getAttribute("value");
@@ -1569,6 +1650,8 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(sleepTimeCalendar));
             selectDateInterviewPage();
 
+            Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
+
             //fifth state
             WebElement element5 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element5.click();
@@ -1578,7 +1661,6 @@ public class Main implements CommandLineRunner {
             boolean selectDataMet5 = true;
 
             while (selectDataMet5) {
-                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
                 select1.selectByVisibleText(interviewState3);
                 WebElement calendar5 = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate5 = calendar5.getAttribute("value");
@@ -1593,13 +1675,14 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(sleepTimeCalendar));
             selectDateInterviewPage();
 
+            Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
+
             WebElement element1 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element1.click();
             selectedState = select1.getFirstSelectedOption();
             boolean selectDataMet1 = true;
 
             while (selectDataMet1) {
-                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
                 select1.selectByVisibleText(interviewState4);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
@@ -1628,6 +1711,8 @@ public class Main implements CommandLineRunner {
                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
                 driver = new EdgeDriver(options);
             }
+
+            Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
             //second state
             WebElement element = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element.click();
@@ -1637,7 +1722,6 @@ public class Main implements CommandLineRunner {
             boolean selectDataMet = true;
 
             while (selectDataMet) {
-                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
                 select1.selectByVisibleText(interviewState);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
@@ -1652,6 +1736,8 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(sleepTimeCalendar));
             selectDateInterviewPage();
 
+            Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
+
             //Third state
             WebElement element3 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element3.click();
@@ -1661,7 +1747,6 @@ public class Main implements CommandLineRunner {
             boolean selectDataMet3 = true;
 
             while (selectDataMet3) {
-                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
                 select1.selectByVisibleText(interviewState1);
                 WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate3 = calendar3.getAttribute("value");
@@ -1676,6 +1761,8 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(sleepTimeCalendar));
             selectDateInterviewPage();
 
+            Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
+
             //fourth state
             WebElement element4 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element4.click();
@@ -1685,7 +1772,6 @@ public class Main implements CommandLineRunner {
             boolean selectDataMet4 = true;
 
             while (selectDataMet4) {
-                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
                 select1.selectByVisibleText(interviewState2);
                 WebElement calendar4 = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate4 = calendar4.getAttribute("value");
@@ -1700,13 +1786,14 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(sleepTimeCalendar));
             selectDateInterviewPage();
 
+            Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
+
             WebElement element1 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element1.click();
             selectedState = select1.getFirstSelectedOption();
             boolean selectDataMet1 = true;
 
             while (selectDataMet1) {
-                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
                 select1.selectByVisibleText(interviewState3);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
@@ -1735,6 +1822,8 @@ public class Main implements CommandLineRunner {
                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
                 driver = new EdgeDriver(options);
             }
+
+            Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
             //second state
             WebElement element = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element.click();
@@ -1744,7 +1833,6 @@ public class Main implements CommandLineRunner {
             boolean selectDataMet = true;
 
             while (selectDataMet) {
-                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
                 select1.selectByVisibleText(interviewState);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
@@ -1759,6 +1847,8 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(sleepTimeCalendar));
             selectDateInterviewPage();
 
+            Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
+
             //Third state
             WebElement element3 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element3.click();
@@ -1769,7 +1859,6 @@ public class Main implements CommandLineRunner {
             boolean selectDataMet3 = true;
 
             while (selectDataMet3) {
-                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
                 select1.selectByVisibleText(interviewState1);
                 WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate3 = calendar3.getAttribute("value");
@@ -1784,6 +1873,8 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(sleepTimeCalendar));
             selectDateInterviewPage();
 
+            Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
+
             WebElement element1 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
             element1.click();
             select1.selectByVisibleText(selectState);
@@ -1791,7 +1882,6 @@ public class Main implements CommandLineRunner {
             boolean selectDataMet1 = true;
 
             while (selectDataMet1) {
-                Thread.sleep(Long.parseLong(CounselorPageTimeCalendar));
                 select1.selectByVisibleText(interviewState2);
                 WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 String selectedDate = calendar.getAttribute("value");
@@ -1897,10 +1987,10 @@ public class Main implements CommandLineRunner {
 
             dateRangeInterviewPageDifferentMonth();
 
+            //Click next Month Element
             WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonth = new Select(secondElement);
-            secondMonth.selectByVisibleText(secondSelectMonth);
+            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            secondElement.click();
 
             completeMonthForInterviewPage();
 
@@ -1923,17 +2013,17 @@ public class Main implements CommandLineRunner {
 
             dateRangeInterviewPageDifferentMonth();
 
+            //Click next Month Element
             WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonth = new Select(secondElement);
-            secondMonth.selectByVisibleText(secondSelectMonth);
+            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            secondElement.click();
 
             completeMonthForInterviewPage();
 
+            //Click next Month Element
             WebDriverWait thirdMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select thirdMonth = new Select(thirdElement);
-            thirdMonth.selectByVisibleText(thirdSelectMonth);
+            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            thirdElement.click();
 
             completeThirdMonthForInterviewPage();
 
@@ -1956,24 +2046,24 @@ public class Main implements CommandLineRunner {
 
             dateRangeInterviewPageDifferentMonth();
 
+            //Click next Month Element
             WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonth = new Select(secondElement);
-            secondMonth.selectByVisibleText(secondSelectMonth);
+            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            secondElement.click();
 
             completeMonthForInterviewPage();
 
+            //Click next Month Element
             WebDriverWait thirdMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select thirdMonth = new Select(thirdElement);
-            thirdMonth.selectByVisibleText(thirdSelectMonth);
+            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            thirdElement.click();
 
             completeThirdMonthForInterviewPage();
 
+            //Click next Month Element
             WebDriverWait fourthMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement fourthElement = fourthMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select fourthMonth = new Select(fourthElement);
-            fourthMonth.selectByVisibleText(fourthSelectMonth);
+            WebElement fourthElement = fourthMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            fourthElement.click();
 
             completeFourthMonthForInterviewPage();
 
@@ -1996,12 +2086,19 @@ public class Main implements CommandLineRunner {
 
             dateRangeInterviewPageDifferentMonth();
 
+            //Click next Month Element
             WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonth = new Select(secondElement);
-            secondMonth.selectByVisibleText(secondSelectMonth);
+            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            secondElement.click();
 
-            if (!secondSelectMonth.equals("Dec")) {
+            WebDriverWait secondMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement second = secondMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            Select secondMonths = new Select(second);
+            WebElement textElement = secondMonths.getFirstSelectedOption();
+            String validateMonthElement = textElement.getText();
+
+
+            if (!validateMonthElement.equals("Dec")) {
                 WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
                 WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
                 Select NextYear = new Select(nextYearElement);
@@ -2029,25 +2126,40 @@ public class Main implements CommandLineRunner {
 
             dateRangeInterviewPageDifferentMonth();
 
+            //Click next Month Element
             WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonth = new Select(secondElement);
-            secondMonth.selectByVisibleText(secondSelectMonth);
+            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            secondElement.click();
 
-            if (!secondSelectMonth.equals("Nov")) {
+            WebDriverWait secondMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement second = secondMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            Select secondMonths = new Select(second);
+            WebElement textElement = secondMonths.getFirstSelectedOption();
+            String validateMonthElement = textElement.getText();
+
+
+            if (!validateMonthElement.equals("Nov")) {
                 WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
                 WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
                 Select NextYear = new Select(nextYearElement);
                 NextYear.selectByVisibleText(toSelectYear);
             }
+
             completeMonthForInterviewPage();
 
+            //Click next Month Element
             WebDriverWait thirdMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select thirdMonth = new Select(thirdElement);
-            thirdMonth.selectByVisibleText(thirdSelectMonth);
+            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            thirdElement.click();
 
-            if (!thirdSelectMonth.equals("Dec")) {
+            WebDriverWait thirdMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement third = thirdMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            Select thirdMonths = new Select(third);
+            WebElement textThirdElement = thirdMonths.getFirstSelectedOption();
+            String validateThirdMonthElement = textThirdElement.getText();
+
+
+            if (!validateThirdMonthElement.equals("Dec")) {
                 WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
                 WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
                 Select NextYear = new Select(nextYearElement);
@@ -2080,12 +2192,19 @@ public class Main implements CommandLineRunner {
 
             dateRangeInterviewPageDifferentMonth();
 
+            //Click next Month Element
             WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonth = new Select(secondElement);
-            secondMonth.selectByVisibleText(secondSelectMonth);
+            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            secondElement.click();
 
-            if (!secondSelectMonth.equals("Oct")) {
+            WebDriverWait secondMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement second = secondMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            Select secondMonths = new Select(second);
+            WebElement textElement = secondMonths.getFirstSelectedOption();
+            String validateMonthElement = textElement.getText();
+
+
+            if (!validateMonthElement.equals("Oct")) {
                 WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
                 WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
                 Select NextYear = new Select(nextYearElement);
@@ -2094,12 +2213,19 @@ public class Main implements CommandLineRunner {
 
             completeMonthForInterviewPage();
 
+            //Click next Month Element
             WebDriverWait thirdMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select thirdMonth = new Select(thirdElement);
-            thirdMonth.selectByVisibleText(thirdSelectMonth);
+            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            thirdElement.click();
 
-            if (!thirdSelectMonth.equals("Nov")) {
+            WebDriverWait thirdMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement third = thirdMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            Select thirdMonths = new Select(third);
+            WebElement textThirdElement = thirdMonths.getFirstSelectedOption();
+            String validateThirdMonthElement = textThirdElement.getText();
+
+
+            if (!validateThirdMonthElement.equals("Nov")) {
                 WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
                 WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
                 Select NextYear = new Select(nextYearElement);
@@ -2108,12 +2234,19 @@ public class Main implements CommandLineRunner {
 
             completeThirdMonthForInterviewPage();
 
+            //Click next Month Element
             WebDriverWait fourthMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement fourthElement = fourthMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select fourthMonth = new Select(fourthElement);
-            fourthMonth.selectByVisibleText(fourthSelectMonth);
+            WebElement fourthElement = fourthMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            fourthElement.click();
 
-            if (!fourthSelectMonth.equals("Dec")) {
+            WebDriverWait fourthMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement fourth = fourthMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            Select fourthMonths = new Select(fourth);
+            WebElement textFourthElement = fourthMonths.getFirstSelectedOption();
+            String validateFourthMonthElement = textFourthElement.getText();
+
+
+            if (!validateFourthMonthElement.equals("Dec")) {
                 WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
                 WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
                 Select NextYear = new Select(nextYearElement);
