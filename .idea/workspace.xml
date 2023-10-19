@@ -29,20 +29,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/pc/Downloads/CabEase-new&quot;,
-    &quot;onboarding.tips.debug.path&quot;: &quot;C:/Users/pc/Documents/VisaApplication/src/main/java/org/visaapplication/Main.java&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;SDKs&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/pc/Downloads/major",
+    "onboarding.tips.debug.path": "C:/Users/pc/Documents/VisaApplication/src/main/java/org/visaapplication/Main.java",
+    "project.structure.last.edited": "SDKs",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\pc\Documents\VisaApplication" />
@@ -163,7 +163,14 @@
       <option name="project" value="LOCAL" />
       <updated>1696355942283</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="counsaler different month">
+      <created>1696525715227</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1696525715227</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -177,53 +184,138 @@
       <breakpoints>
         <line-breakpoint type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>1585</line>
-          <option name="timeStamp" value="201" />
-        </line-breakpoint>
-        <line-breakpoint type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>2314</line>
-          <option name="timeStamp" value="211" />
-        </line-breakpoint>
-        <line-breakpoint type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>2336</line>
-          <option name="timeStamp" value="214" />
-        </line-breakpoint>
-        <line-breakpoint type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>264</line>
-          <option name="timeStamp" value="218" />
-        </line-breakpoint>
-        <line-breakpoint type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>1048</line>
-          <option name="timeStamp" value="220" />
-        </line-breakpoint>
-        <line-breakpoint type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>1471</line>
-          <option name="timeStamp" value="223" />
-        </line-breakpoint>
-        <line-breakpoint type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>2340</line>
-          <option name="timeStamp" value="224" />
-        </line-breakpoint>
-        <line-breakpoint type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>2284</line>
-          <option name="timeStamp" value="225" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>1566</line>
+          <line>1699</line>
           <option name="timeStamp" value="226" />
         </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>417</line>
+          <option name="timeStamp" value="257" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>451</line>
+          <option name="timeStamp" value="258" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>467</line>
+          <option name="timeStamp" value="259" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>757</line>
+          <option name="timeStamp" value="261" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>744</line>
+          <option name="timeStamp" value="263" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>725</line>
+          <option name="timeStamp" value="268" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>724</line>
+          <option name="timeStamp" value="269" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>727</line>
+          <option name="timeStamp" value="270" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>1320</line>
+          <option name="timeStamp" value="281" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>1359</line>
+          <option name="timeStamp" value="282" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>1436</line>
+          <option name="timeStamp" value="284" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>1474</line>
+          <option name="timeStamp" value="285" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>1514</line>
+          <option name="timeStamp" value="286" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>1551</line>
+          <option name="timeStamp" value="287" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>1581</line>
+          <option name="timeStamp" value="288" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>2666</line>
+          <option name="timeStamp" value="289" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>2733</line>
+          <option name="timeStamp" value="291" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>2754</line>
+          <option name="timeStamp" value="292" />
+        </line-breakpoint>
+        <line-breakpoint type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>2784</line>
+          <option name="timeStamp" value="293" />
+        </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
-          <line>1546</line>
-          <option name="timeStamp" value="227" />
+          <line>237</line>
+          <option name="timeStamp" value="302" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>169</line>
+          <option name="timeStamp" value="304" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>175</line>
+          <option name="timeStamp" value="305" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>1643</line>
+          <option name="timeStamp" value="306" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>1728</line>
+          <option name="timeStamp" value="307" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>2679</line>
+          <option name="timeStamp" value="308" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/org/visaapplication/Main.java</url>
+          <line>252</line>
+          <option name="timeStamp" value="309" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
