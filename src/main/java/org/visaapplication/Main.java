@@ -1474,8 +1474,8 @@ public class Main implements CommandLineRunner {
             driver.quit();
         }
         WebDriverManager.chromedriver().setup();
-//        ChromeOptions options = new ChromeOptions();
-//        options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
+        ChromeOptions options = new ChromeOptions();
+        options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
         driver = new ChromeDriver();
     }
 
