@@ -35,7 +35,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @SpringBootApplication
-@PropertySource("file:src/main/resources/application.properties")
+@PropertySource("file:application.properties")
 public class Main implements CommandLineRunner {
      WebDriver driver;
      Logger log = LogManager.getLogger(Main.class);
@@ -130,7 +130,6 @@ public class Main implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
         Timer timer = new Timer();
-        boolean conditionMet = false;
 
         timer.schedule(new TimerTask() {
 
@@ -144,30 +143,6 @@ public class Main implements CommandLineRunner {
                         openFireFoxBrowser();
                     } else {
                         openEdgeBrowser();
-
-                    }
-
-                    driver.get("https://www.usvisascheduling.com/en-US/");
-
-                try {
-                    Thread.sleep(20000L);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-
-                LocalDate targetDate = LocalDate.of(2023, 11, 30);
-                    boolean conditionMet = true;
-
-                    // Start the application loop
-                    while (conditionMet) {
-                        LocalDate currentDate = LocalDate.now();
-
-                        // Compare the current date with the target date
-                        if (currentDate.isAfter(targetDate) || currentDate.isEqual(targetDate)) {
-                            throw new RuntimeException("Demo Application is only used for particular time period.");
-                        } else {
-                            conditionMet = false;
-                        }
 
                     }
 
@@ -340,7 +315,6 @@ public class Main implements CommandLineRunner {
             driver.quit();
             if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
                 ChromeOptions options = new ChromeOptions();
-                
                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
                 driver = new ChromeDriver(options);
             } else if (browser.equals("firefox")) {
@@ -350,7 +324,6 @@ public class Main implements CommandLineRunner {
                 driver = new FirefoxDriver(options);
             } else {
                 EdgeOptions options = new EdgeOptions();
-                
                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
                 driver = new EdgeDriver(options);
             }
@@ -1476,7 +1449,7 @@ public class Main implements CommandLineRunner {
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-        driver = new ChromeDriver();
+        driver = new ChromeDriver(options);
     }
 
     public void openFireFoxBrowser() {
@@ -1663,7 +1636,7 @@ public class Main implements CommandLineRunner {
                 JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
                 jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                 jsExecutor.executeScript("arguments[0].click();", radioElement);
-//                driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
+                driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
                 playAudio("file_example_WAV_1MG.wav");
                 throw new RuntimeException("The Interview Date is selected as " + date);
             } catch (NoSuchElementException exception) {
@@ -1743,7 +1716,7 @@ public class Main implements CommandLineRunner {
                 JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
                 jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                 jsExecutor.executeScript("arguments[0].click();", radioElement);
-//                driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
+                driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
                 playAudio("file_example_WAV_1MG.wav");
                 throw new RuntimeException("The Interview Date is selected as " + date);
 
@@ -1823,7 +1796,7 @@ public class Main implements CommandLineRunner {
                 JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
                 jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                 jsExecutor.executeScript("arguments[0].click();", radioElement);
-//                driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
+                driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
                 playAudio("file_example_WAV_1MG.wav");
                 throw new RuntimeException("The Interview Date is selected as " + date);
 
@@ -1917,8 +1890,7 @@ public class Main implements CommandLineRunner {
             driver.quit();
              if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
                 ChromeOptions options = new ChromeOptions();
-                 
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
+                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
                 driver = new ChromeDriver(options);
             } else if (browser.equals("firefox")) {
                 FirefoxOptions options = new FirefoxOptions();
@@ -1967,7 +1939,7 @@ public class Main implements CommandLineRunner {
             driver.quit();
              if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
                 ChromeOptions options = new ChromeOptions();
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
+                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
                 driver = new ChromeDriver(options);
             } else if (browser.equals("firefox")) {
                 FirefoxOptions options = new FirefoxOptions();
@@ -1976,8 +1948,7 @@ public class Main implements CommandLineRunner {
                 driver = new FirefoxDriver(options);
             } else {
                 EdgeOptions options = new EdgeOptions();
-                 
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
+                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
                 driver = new EdgeDriver(options);
             }
 
@@ -2064,8 +2035,7 @@ public class Main implements CommandLineRunner {
             driver.quit();
              if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
                 ChromeOptions options = new ChromeOptions();
-                 
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
+                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
                 driver = new ChromeDriver(options);
             } else if (browser.equals("firefox")) {
                 FirefoxOptions options = new FirefoxOptions();
@@ -2309,8 +2279,7 @@ public class Main implements CommandLineRunner {
             driver.quit();
              if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
                 ChromeOptions options = new ChromeOptions();
-                 
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
+                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
                 driver = new ChromeDriver(options);
             } else if (browser.equals("firefox")) {
                 FirefoxOptions options = new FirefoxOptions();
@@ -2319,8 +2288,7 @@ public class Main implements CommandLineRunner {
                 driver = new FirefoxDriver(options);
             } else {
                 EdgeOptions options = new EdgeOptions();
-                
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
+                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
                 driver = new EdgeDriver(options);
             }
 
@@ -2512,7 +2480,6 @@ public class Main implements CommandLineRunner {
                 driver = new FirefoxDriver(options);
             } else {
                 EdgeOptions options = new EdgeOptions();
-                
                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
                 driver = new EdgeDriver(options);
             }
@@ -3053,7 +3020,7 @@ public class Main implements CommandLineRunner {
                     JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
                     jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                     jsExecutor.executeScript("arguments[0].click();", radioElement);
-//                    driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
+                    driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
                     playAudio("file_example_WAV_1MG.wav");
                     throw new RuntimeException("The Interview Date is selected as " + date);
 
@@ -3078,7 +3045,7 @@ public class Main implements CommandLineRunner {
                     JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
                     jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                     jsExecutor.executeScript("arguments[0].click();", radioElement);
-//                    driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
+                    driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
                     playAudio("file_example_WAV_1MG.wav");
                     throw new RuntimeException("The Interview Date is selected as " + date);
                 } catch (NoSuchElementException exception) {
@@ -3116,7 +3083,7 @@ public class Main implements CommandLineRunner {
                         JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
                         jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                         jsExecutor.executeScript("arguments[0].click();", radioElement);
-//                        driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
+                        driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
                         playAudio("file_example_WAV_1MG.wav");
                         throw new RuntimeException("The Interview Date is selected as " + date);
                 } catch (NoSuchElementException exception) {
@@ -3138,7 +3105,7 @@ public class Main implements CommandLineRunner {
                         JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
                         jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                         jsExecutor.executeScript("arguments[0].click();", radioElement);
-//                        driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
+                        driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
                         playAudio("file_example_WAV_1MG.wav");
                         throw new RuntimeException("The Interview Date is selected as " + date);
 
@@ -3169,7 +3136,7 @@ public class Main implements CommandLineRunner {
                     JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
                     jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                     jsExecutor.executeScript("arguments[0].click();", radioElement);
-//                    driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
+                    driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
                     playAudio("file_example_WAV_1MG.wav");
                     throw new RuntimeException("The Interview Date is selected as " + date);
 
