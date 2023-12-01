@@ -39,8 +39,6 @@ import java.util.TimerTask;
 public class Main implements CommandLineRunner {
      WebDriver driver;
      Logger log = LogManager.getLogger(Main.class);
-
-    private Scheduler scheduler;
      WebElement selectedState;
 
     @Value("${port:}")
@@ -129,7 +127,9 @@ public class Main implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        Timer timer = new Timer();
+
+        Timer timer= new Timer();
+
 
         timer.schedule(new TimerTask() {
 
@@ -161,6 +161,8 @@ public class Main implements CommandLineRunner {
                             throw new RuntimeException(e);
                         }
                     }
+
+                    driver.quit();
 
             }
         }, 0, Long.parseLong(schedulerTime));
