@@ -11,11 +11,9 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -30,18 +28,29 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
 @SpringBootApplication
-@PropertySource("file:application.properties")
+@PropertySource("file:src/main/resources/application.properties")
 public class Main implements CommandLineRunner {
      WebDriver driver;
      Logger log = LogManager.getLogger(Main.class);
-
-    private Scheduler scheduler;
      WebElement selectedState;
+    WebElement webElement;
+    WebElement blankDropDown;
+    Select select1;
+    String selectedDate;
+
+    Select month;
+
+    Select year;
+
+    JavascriptExecutor jsExecutor;
+
+    WebDriverWait webDriverWait;
+
+    Timer timer;
 
     @Value("${port:}")
     private String port;
@@ -102,8 +111,6 @@ public class Main implements CommandLineRunner {
 
     @Value("${schedulerTime:}")
     private String schedulerTime;
-
-
     @Value("${numberInterview:}")
     private String numberInterview;
 
@@ -129,38 +136,34 @@ public class Main implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        Timer timer = new Timer();
+        if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
+            openChromeBrowser();
+        } else {
+            openEdgeBrowser();
+
+        }
+
+        timer = new Timer();
 
         timer.schedule(new TimerTask() {
 
             @Parameters("browser")
             public void run() {
-                    LocalDateTime timestamp =  LocalDateTime.now();
-                    System.out.println(timestamp);
-                    if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
-                        openChromeBrowser();
-                    } else if (browser.equals("firefox")) {
-                        openFireFoxBrowser();
-                    } else {
-                        openEdgeBrowser();
-
-                    }
-
-                    WebElement ofc = driver.findElement(By.xpath("(//label[@class='control-label'])[1]"));
-                    String ofcPost = ofc.getText();
-                    if (ofcPost.equals("OFC Post")) {
-                        try {
-                            selectState();
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    } else if(ofcPost.equals("Consular Posts")) {
-                        try {
-                            selectStateConsularPosts();
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
+            System.out.println(LocalDateTime.now());
+            webElement = driver.findElement(By.xpath("(//label[@class='control-label'])[1]"));
+            if (webElement.getText().equals("OFC Post")) {
+                try {
+                    selectState();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            } else if(webElement.getText().equals("Consular Posts")) {
+                try {
+                    selectStateConsularPosts();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
 
             }
         }, 0, Long.parseLong(schedulerTime));
@@ -169,31 +172,24 @@ public class Main implements CommandLineRunner {
 
     public void selectState() throws InterruptedException {
 
+        driver.quit();
+        if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
+            openChromeBrowser();
+        } else {
+            openEdgeBrowser();
+        }
+
         String switchLocation = number;
-        WebDriverWait fromMontElement = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement nameElement=fromMontElement.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//ul[@id='gm_select']//li//label")));
-        if (nameElement.getText()!=null) {
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        webElement=webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//ul[@id='gm_select']//li//label")));
+        if (webElement.getText()!=null) {
 
 
         if (switchLocation.equals("one")) {
-            driver.quit();
-            if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
-                ChromeOptions options = new ChromeOptions();
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new ChromeDriver(options);
-            } else if (browser.equals("firefox")) {
-                FirefoxOptions options = new FirefoxOptions();
-                options.addArguments("--start-debugger-server", "localhost:" + Integer.parseInt(port));
-                driver = new FirefoxDriver(options);
-            } else {
-                EdgeOptions options = new EdgeOptions();
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new EdgeDriver(options);
-            }
-            WebElement element = driver.findElement(By.xpath("//label[contains(text(),'')]"));
-            element.click();
-            WebElement blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
-            Select select1 = new Select(blankDropDown);
+            webElement = driver.findElement(By.xpath("//label[contains(text(),'')]"));
+            webElement.click();
+            blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+            select1 = new Select(blankDropDown);
             select1.selectByVisibleText("");
 
             boolean selectDataMet = true;
@@ -202,13 +198,13 @@ public class Main implements CommandLineRunner {
                 select1.selectByVisibleText(selectState);
                 selectedState = select1.getFirstSelectedOption();
                 Thread.sleep(Long.parseLong(blankCalendarTimer));
-                WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate = calendar.getAttribute("value");
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
                 // Compare the current date with the target date
                 if (selectedDate.equals("Select Date")) {
-                    calendar.click();
+                    webElement.click();
                     if (!driver.findElement(By.xpath("//div[@id='ui-datepicker-div']")).isDisplayed()) {
-                        calendar.click();
+                        webElement.click();
                     }
                     selectDataMet = false;
                 } else if (selectedDate.equals("")){
@@ -223,45 +219,31 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(sleepTimeCalendar));
             selectDate();
         } else if (switchLocation.equals("two")) {
-            driver.quit();
-            if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
-                ChromeOptions options = new ChromeOptions();
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new ChromeDriver(options);
-            } else if (browser.equals("firefox")) {
-                FirefoxOptions options = new FirefoxOptions();
-                options.addArguments("--start-debugger-server", "localhost:" + Integer.parseInt(port));
-                driver = new FirefoxDriver(options);
-            } else {
-                EdgeOptions options = new EdgeOptions();
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new EdgeDriver(options);
-            }
-            WebElement element = driver.findElement(By.xpath("//label[contains(text(),'')]"));
-            element.click();
-            WebElement blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
-            Select select1 = new Select(blankDropDown);
+            webElement = driver.findElement(By.xpath("//label[contains(text(),'')]"));
+            webElement.click();
+            blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+            select1 = new Select(blankDropDown);
             select1.selectByVisibleText(selectState);
             selectedState = select1.getFirstSelectedOption();
             boolean selectDataMet = true;
 
             while (selectDataMet) {
-                WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate = calendar.getAttribute("value");
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
 
                 if (selectedDate.equals("Select Date")) {
-                    calendar.click();
+                    webElement.click();
                     selectDataMet = false;
                 } else if(selectedDate.equals("")) {
                     select1.selectByVisibleText(selectState1);
                     selectedState = select1.getFirstSelectedOption();
                     Thread.sleep(Long.parseLong(blankCalendarTimer));
-                    WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate2 = calendar2.getAttribute("value");
-                    if (selectedDate2.equals("Select Date")) {
-                        calendar2.click();
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet = false;
-                    } else if (selectedDate2.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         selectDataMet = true;
                     }
 
@@ -272,13 +254,13 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(sleepTimeCalendar));
             selectDate();
 
-            WebElement ofc = driver.findElement(By.xpath("(//label[@class='control-label'])[1]"));
-            String ofcPost = ofc.getText();
+            webElement = driver.findElement(By.xpath("(//label[@class='control-label'])[1]"));
+            String ofcPost = webElement.getText();
             if (ofcPost.equals("OFC Post")) {
-                WebElement element2 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
-                element2.click();
-                WebElement blankDropDown1 = driver.findElement(By.xpath("//select[@id='post_select']"));
-                Select select2 = new Select(blankDropDown1);
+                webElement = driver.findElement(By.xpath("//label[contains(text(),'')]"));
+                webElement.click();
+                blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+                Select select2 = new Select(blankDropDown);
                 select2.selectByVisibleText(selectState1);
                 selectedState = select2.getFirstSelectedOption();
 
@@ -286,22 +268,22 @@ public class Main implements CommandLineRunner {
 
                 while (selectDataMet2) {
 
-                    WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate2 = calendar2.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
                     // Compare the current date with the target date
-                    if (selectedDate2.equals("Select Date")) {
-                        calendar2.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet2 = false;
-                    } else if (selectedDate2.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         select2.selectByVisibleText(selectState);
                         selectedState = select2.getFirstSelectedOption();
                         Thread.sleep(Long.parseLong(blankCalendarTimer));
-                        WebElement calendar1 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                        String selectedDate1 = calendar1.getAttribute("value");
-                        if (selectedDate1.equals("Select Date")) {
-                            calendar1.click();
+                        webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                        selectedDate = webElement.getAttribute("value");
+                        if (selectedDate.equals("Select Date")) {
+                            webElement.click();
                             selectDataMet2 = false;
-                        } else if (selectedDate2.equals("")) {
+                        } else if (selectedDate.equals("")) {
                             selectDataMet2 = true;
                         }
                     } else {
@@ -312,75 +294,60 @@ public class Main implements CommandLineRunner {
                 selectDate();
             }
         } else if (switchLocation.equals("five")) {
-            driver.quit();
-            if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
-                ChromeOptions options = new ChromeOptions();
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new ChromeDriver(options);
-            } else if (browser.equals("firefox")) {
-                FirefoxOptions options = new FirefoxOptions();
-                
-                options.addArguments("--start-debugger-server", "localhost:" + Integer.parseInt(port));
-                driver = new FirefoxDriver(options);
-            } else {
-                EdgeOptions options = new EdgeOptions();
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new EdgeDriver(options);
-            }
             //first state
-            WebElement element = driver.findElement(By.xpath("//label[contains(text(),'')]"));
-            element.click();
-            WebElement blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
-            Select select1 = new Select(blankDropDown);
+            webElement = driver.findElement(By.xpath("//label[contains(text(),'')]"));
+            webElement.click();
+            blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+            select1 = new Select(blankDropDown);
 
             boolean selectDataMet = true;
 
             while (selectDataMet) {
                 select1.selectByVisibleText(selectState);
                 selectedState = select1.getFirstSelectedOption();
-                WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate = calendar.getAttribute("value");
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
 
                 if (selectedDate.equals("Select Date")) {
-                    calendar.click();
+                    webElement.click();
                     selectDataMet = false;
                 } else if(selectedDate.equals("")) {
                     select1.selectByVisibleText(selectState1);
                     selectedState = select1.getFirstSelectedOption();
                     Thread.sleep(Long.parseLong(blankCalendarTimer));
-                    WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate2 = calendar2.getAttribute("value");
-                    if (selectedDate2.equals("Select Date")) {
-                        calendar2.click();
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet = false;
-                    } else if (selectedDate2.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         select1.selectByVisibleText(selectState2);
                         selectedState = select1.getFirstSelectedOption();
                         Thread.sleep(Long.parseLong(blankCalendarTimer));
-                        WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                        String selectedDate3 = calendar3.getAttribute("value");
-                        if (selectedDate3.equals("Select Date")) {
-                            calendar3.click();
+                        webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                        selectedDate = webElement.getAttribute("value");
+                        if (selectedDate.equals("Select Date")) {
+                            webElement.click();
                             selectDataMet = false;
-                        } else if (selectedDate3.equals("")) {
+                        } else if (selectedDate.equals("")) {
                             select1.selectByVisibleText(selectState3);
                             selectedState = select1.getFirstSelectedOption();
                             Thread.sleep(Long.parseLong(blankCalendarTimer));
-                            WebElement calendar4 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                            String selectedDate4 = calendar4.getAttribute("value");
-                            if (selectedDate4.equals("Select Date")) {
-                                calendar4.click();
+                            webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                            selectedDate = webElement.getAttribute("value");
+                            if (selectedDate.equals("Select Date")) {
+                                webElement.click();
                                 selectDataMet = false;
-                            } else if (selectedDate4.equals("")) {
+                            } else if (selectedDate.equals("")) {
                                 select1.selectByVisibleText(selectState4);
                                 selectedState = select1.getFirstSelectedOption();
                                 Thread.sleep(Long.parseLong(blankCalendarTimer));
-                                WebElement calendar5 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                                String selectedDate5 = calendar5.getAttribute("value");
-                                if (selectedDate5.equals("Select Date")) {
-                                    calendar5.click();
+                                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                                selectedDate = webElement.getAttribute("value");
+                                if (selectedDate.equals("Select Date")) {
+                                    webElement.click();
                                     selectDataMet = false;
-                                } else if (selectedDate5.equals("")) {
+                                } else if (selectedDate.equals("")) {
                                     selectDataMet = true;
                                 }
                             }
@@ -393,64 +360,64 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(sleepTimeCalendar));
             selectDate();
 
-            WebElement ofc = driver.findElement(By.xpath("(//label[@class='control-label'])[1]"));
-            String ofcPost = ofc.getText();
+            webElement = driver.findElement(By.xpath("(//label[@class='control-label'])[1]"));
+            String ofcPost = webElement.getText();
             if (ofcPost.equals("OFC Post")) {
 
-                WebElement element2 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
-                element2.click();
-                Select select2 = new Select(blankDropDown);
+                webElement = driver.findElement(By.xpath("//label[contains(text(),'')]"));
+                webElement.click();
+                Select select2 = new Select(webElement);
 
                 boolean selectDataMet2 = true;
 
                 while (selectDataMet2) {
                     select2.selectByVisibleText(selectState1);
                     selectedState = select2.getFirstSelectedOption();
-                    WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate2 = calendar2.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
                     // Compare the current date with the target date
-                    if (selectedDate2.equals("Select Date")) {
-                        calendar2.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet2 = false;
-                    } else if (selectedDate2.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         select2.selectByVisibleText(selectState2);
                         selectedState = select2.getFirstSelectedOption();
                         Thread.sleep(Long.parseLong(blankCalendarTimer));
-                        WebElement calendar1 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                        String selectedDate1 = calendar1.getAttribute("value");
+                        webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                        selectedDate = webElement.getAttribute("value");
 
-                        if (selectedDate1.equals("Select Date")) {
-                            calendar1.click();
+                        if (selectedDate.equals("Select Date")) {
+                            webElement.click();
                             selectDataMet2 = false;
-                        } else if (selectedDate1.equals("")) {
+                        } else if (selectedDate.equals("")) {
                             select2.selectByVisibleText(selectState3);
                             selectedState = select2.getFirstSelectedOption();
                             Thread.sleep(Long.parseLong(blankCalendarTimer));
-                            WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                            String selectedDate3 = calendar3.getAttribute("value");
+                            webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                            selectedDate= webElement.getAttribute("value");
 
-                            if (selectedDate3.equals("Select Date")) {
-                                calendar3.click();
+                            if (selectedDate.equals("Select Date")) {
+                                webElement.click();
                                 selectDataMet2 = false;
-                            } else if (selectedDate3.equals("")) {
+                            } else if (selectedDate.equals("")) {
                                 select2.selectByVisibleText(selectState4);
                                 selectedState = select2.getFirstSelectedOption();
                                 Thread.sleep(Long.parseLong(blankCalendarTimer));
-                                WebElement calendar4 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                                String selectedDate4 = calendar4.getAttribute("value");
+                                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                                selectedDate = webElement.getAttribute("value");
 
-                                if (selectedDate4.equals("Select Date")) {
-                                    calendar4.click();
+                                if (selectedDate.equals("Select Date")) {
+                                    webElement.click();
                                     selectDataMet2 = false;
-                                } else if (selectedDate4.equals("")) {
+                                } else if (selectedDate.equals("")) {
                                     select2.selectByVisibleText(selectState);
                                     selectedState = select2.getFirstSelectedOption();
                                     Thread.sleep(Long.parseLong(blankCalendarTimer));
-                                    WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                                    String selectedDate = calendar.getAttribute("value");
+                                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                                    selectedDate = webElement.getAttribute("value");
 
                                     if (selectedDate.equals("Select Date")) {
-                                        calendar.click();
+                                        webElement.click();
                                         selectDataMet2 = false;
                                     } else if (selectedDate.equals("")) {
                                         selectDataMet2 = true;
@@ -468,59 +435,59 @@ public class Main implements CommandLineRunner {
 //            third location
 
             if (ofcPost.equals("OFC Post")) {
-                WebElement element3 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
-                element3.click();
-                WebElement blankDropDown3 = driver.findElement(By.xpath("//select[@id='post_select']"));
-                Select select3 = new Select(blankDropDown3);
+                webElement = driver.findElement(By.xpath("//label[contains(text(),'')]"));
+                webElement.click();
+                blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+                Select select3 = new Select(blankDropDown);
 
                 boolean selectDataMet3 = true;
 
                 while (selectDataMet3) {
                     select3.selectByVisibleText(selectState2);
                     selectedState = select3.getFirstSelectedOption();
-                    WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate3 = calendar3.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
 
-                    if (selectedDate3.equals("Select Date")) {
-                        calendar3.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet3 = false;
-                    } else if (selectedDate3.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         select3.selectByVisibleText(selectState3);
                         selectedState = select3.getFirstSelectedOption();
                         Thread.sleep(Long.parseLong(blankCalendarTimer));
-                        WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                        String selectedDate2 = calendar2.getAttribute("value");
-                        if (selectedDate2.equals("Select Date")) {
-                            calendar2.click();
+                        webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                        selectedDate = webElement.getAttribute("value");
+                        if (selectedDate.equals("Select Date")) {
+                            webElement.click();
                             selectDataMet3 = false;
-                        } else if (selectedDate2.equals("")) {
+                        } else if (selectedDate.equals("")) {
                             select3.selectByVisibleText(selectState4);
                             selectedState = select3.getFirstSelectedOption();
                             Thread.sleep(Long.parseLong(blankCalendarTimer));
-                            WebElement calendar4 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                            String selectedDate4 = calendar4.getAttribute("value");
-                            if (selectedDate4.equals("Select Date")) {
-                                calendar4.click();
+                            webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                            selectedDate = webElement.getAttribute("value");
+                            if (selectedDate.equals("Select Date")) {
+                                webElement.click();
                                 selectDataMet3 = false;
-                            } else if (selectedDate4.equals("")) {
+                            } else if (selectedDate.equals("")) {
                                 select3.selectByVisibleText(selectState);
                                 selectedState = select3.getFirstSelectedOption();
                                 Thread.sleep(Long.parseLong(blankCalendarTimer));
-                                WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                                String selectedDate = calendar.getAttribute("value");
+                                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                                selectedDate = webElement.getAttribute("value");
                                 if (selectedDate.equals("Select Date")) {
-                                    calendar.click();
+                                    webElement.click();
                                     selectDataMet3 = false;
                                 } else if (selectedDate.equals("")) {
                                     select3.selectByVisibleText(selectState1);
                                     selectedState = select3.getFirstSelectedOption();
                                     Thread.sleep(Long.parseLong(blankCalendarTimer));
-                                    WebElement calendar1 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                                    String selectedDate1 = calendar1.getAttribute("value");
-                                    if (selectedDate1.equals("Select Date")) {
-                                        calendar1.click();
+                                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                                    selectedDate = webElement.getAttribute("value");
+                                    if (selectedDate.equals("Select Date")) {
+                                        webElement.click();
                                         selectDataMet3 = false;
-                                    } else if (selectedDate1.equals("")) {
+                                    } else if (selectedDate.equals("")) {
                                         selectDataMet3 = true;
                                     }
                                 }
@@ -535,59 +502,59 @@ public class Main implements CommandLineRunner {
             }
 //            fourth location
             if (ofcPost.equals("OFC Post")) {
-                WebElement element4 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
-                element4.click();
-                WebElement blankDropDown4 = driver.findElement(By.xpath("//select[@id='post_select']"));
-                Select select4 = new Select(blankDropDown4);
+                webElement = driver.findElement(By.xpath("//label[contains(text(),'')]"));
+                webElement.click();
+                blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+                Select select4 = new Select(blankDropDown);
 
                 boolean selectDataMet4 = true;
 
                 while (selectDataMet4) {
                     select4.selectByVisibleText(selectState3);
                     selectedState = select4.getFirstSelectedOption();
-                    WebElement calendar4 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate4 = calendar4.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
                     // Compare the current date with the target date
-                    if (selectedDate4.equals("Select Date")) {
-                        calendar4.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet4 = false;
-                    } else if (selectedDate4.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         select4.selectByVisibleText(selectState4);
                         selectedState = select4.getFirstSelectedOption();
                         Thread.sleep(Long.parseLong(blankCalendarTimer));
-                        WebElement calendar1 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                        String selectedDate1 = calendar1.getAttribute("value");
-                        if (selectedDate1.equals("Select Date")) {
-                            calendar1.click();
+                        webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                        selectedDate = webElement.getAttribute("value");
+                        if (selectedDate.equals("Select Date")) {
+                            webElement.click();
                             selectDataMet4 = false;
-                        } else if (selectedDate1.equals("")) {
+                        } else if (selectedDate.equals("")) {
                             select4.selectByVisibleText(selectState);
                             selectedState = select4.getFirstSelectedOption();
                             Thread.sleep(Long.parseLong(blankCalendarTimer));
-                            WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                            String selectedDate = calendar.getAttribute("value");
+                            webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                            selectedDate = webElement.getAttribute("value");
                             if (selectedDate.equals("Select Date")) {
-                                calendar.click();
+                                webElement.click();
                                 selectDataMet4 = false;
                             } else if (selectedDate.equals("")) {
                                 select4.selectByVisibleText(selectState1);
                                 selectedState = select4.getFirstSelectedOption();
                                 Thread.sleep(Long.parseLong(blankCalendarTimer));
-                                WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                                String selectedDate2 = calendar2.getAttribute("value");
-                                if (selectedDate2.equals("Select Date")) {
-                                    calendar2.click();
+                                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                                selectedDate = webElement.getAttribute("value");
+                                if (selectedDate.equals("Select Date")) {
+                                    webElement.click();
                                     selectDataMet4 = false;
-                                } else if (selectedDate2.equals("")) {
+                                } else if (selectedDate.equals("")) {
                                     select4.selectByVisibleText(selectState2);
                                     selectedState = select4.getFirstSelectedOption();
                                     Thread.sleep(Long.parseLong(blankCalendarTimer));
-                                    WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                                    String selectedDate3 = calendar3.getAttribute("value");
-                                    if (selectedDate3.equals("Select Date")) {
-                                        calendar3.click();
+                                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                                    selectedDate = webElement.getAttribute("value");
+                                    if (selectedDate.equals("Select Date")) {
+                                        webElement.click();
                                         selectDataMet4 = false;
-                                    } else if (selectedDate3.equals("")) {
+                                    } else if (selectedDate.equals("")) {
                                         selectDataMet4 = true;
                                     }
                                 }
@@ -604,62 +571,62 @@ public class Main implements CommandLineRunner {
             if (ofcPost.equals("OFC Post")) {
                 WebElement element5 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
                 element5.click();
-                WebElement blankDropDown5 = driver.findElement(By.xpath("//select[@id='post_select']"));
-                Select select5 = new Select(blankDropDown5);
+                blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+                Select select5 = new Select(blankDropDown);
 
                 boolean selectDataMet5 = true;
 
                 while (selectDataMet5) {
                     select5.selectByVisibleText(selectState4);
                     selectedState = select5.getFirstSelectedOption();
-                    WebElement calendar5 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate5 = calendar5.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
                     // Compare the current date with the target date
-                    if (selectedDate5.equals("Select Date")) {
-                        calendar5.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet5 = false;
-                    } else if (selectedDate5.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         select5.selectByVisibleText(selectState);
                         selectedState = select5.getFirstSelectedOption();
                         Thread.sleep(Long.parseLong(blankCalendarTimer));
-                        WebElement calendar1 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                        String selectedDate1 = calendar1.getAttribute("value");
+                        webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                        selectedDate = webElement.getAttribute("value");
 
-                        if (selectedDate1.equals("Select Date")) {
-                            calendar1.click();
+                        if (selectedDate.equals("Select Date")) {
+                            webElement.click();
                             selectDataMet5 = false;
-                        } else if (selectedDate1.equals("")) {
+                        } else if (selectedDate.equals("")) {
                             select5.selectByVisibleText(selectState1);
                             selectedState = select5.getFirstSelectedOption();
                             Thread.sleep(Long.parseLong(blankCalendarTimer));
-                            WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                            String selectedDate2 = calendar2.getAttribute("value");
+                            webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                            selectedDate = webElement.getAttribute("value");
 
-                            if (selectedDate2.equals("Select Date")) {
-                                calendar2.click();
+                            if (selectedDate.equals("Select Date")) {
+                                webElement.click();
                                 selectDataMet5 = false;
-                            } else if (selectedDate2.equals("")) {
+                            } else if (selectedDate.equals("")) {
 
                                 select5.selectByVisibleText(selectState2);
                                 selectedState = select5.getFirstSelectedOption();
                                 Thread.sleep(Long.parseLong(blankCalendarTimer));
-                                WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                                String selectedDate3 = calendar3.getAttribute("value");
+                                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                                selectedDate = webElement.getAttribute("value");
 
-                                if (selectedDate3.equals("Select Date")) {
-                                    calendar3.click();
+                                if (selectedDate.equals("Select Date")) {
+                                    webElement.click();
                                     selectDataMet5 = false;
-                                } else if (selectedDate3.equals("")) {
+                                } else if (selectedDate.equals("")) {
                                     select5.selectByVisibleText(selectState3);
                                     selectedState = select5.getFirstSelectedOption();
                                     Thread.sleep(Long.parseLong(blankCalendarTimer));
-                                    WebElement calendar4 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                                    String selectedDate4 = calendar4.getAttribute("value");
+                                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                                    selectedDate = webElement.getAttribute("value");
 
-                                    if (selectedDate4.equals("Select Date")) {
-                                        calendar4.click();
+                                    if (selectedDate.equals("Select Date")) {
+                                        webElement.click();
                                         selectDataMet5 = false;
-                                    } else if (selectedDate4.equals("")) {
+                                    } else if (selectedDate.equals("")) {
                                         selectDataMet5 = true;
                                     }
                                 }
@@ -673,68 +640,54 @@ public class Main implements CommandLineRunner {
                 selectDate();
             }
         } else if (switchLocation.equals("four")) {
-            driver.quit();
-            if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
-                ChromeOptions options = new ChromeOptions();
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new ChromeDriver(options);
-            } else if (browser.equals("firefox")) {
-                FirefoxOptions options = new FirefoxOptions();
-                options.addArguments("--start-debugger-server", "localhost:" + Integer.parseInt(port));
-                driver = new FirefoxDriver(options);
-            } else {
-                EdgeOptions options = new EdgeOptions();
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new EdgeDriver(options);
-            }
             //first state
-            WebElement element = driver.findElement(By.xpath("//label[contains(text(),'')]"));
-            element.click();
-            WebElement blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
-            Select select1 = new Select(blankDropDown);
+            webElement = driver.findElement(By.xpath("//label[contains(text(),'')]"));
+            webElement.click();
+            blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+            select1 = new Select(blankDropDown);
 
             boolean selectDataMet = true;
 
             while (selectDataMet) {
                 select1.selectByVisibleText(selectState);
                 selectedState = select1.getFirstSelectedOption();
-                WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate = calendar.getAttribute("value");
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
 
                 if (selectedDate.equals("Select Date")) {
-                    calendar.click();
+                    webElement.click();
                     selectDataMet = false;
                 } else if(selectedDate.equals("")) {
                     select1.selectByVisibleText(selectState1);
                     selectedState = select1.getFirstSelectedOption();
                     Thread.sleep(Long.parseLong(blankCalendarTimer));
-                    WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate2 = calendar2.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
 
-                    if (selectedDate2.equals("Select Date")) {
-                        calendar2.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet = false;
-                    } else if(selectedDate2.equals("")) {
+                    } else if(selectedDate.equals("")) {
                         select1.selectByVisibleText(selectState2);
                         selectedState = select1.getFirstSelectedOption();
                         Thread.sleep(Long.parseLong(blankCalendarTimer));
                         WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                        String selectedDate3 = calendar3.getAttribute("value");
+                        selectedDate = calendar3.getAttribute("value");
 
-                        if (selectedDate3.equals("Select Date")) {
+                        if (selectedDate.equals("Select Date")) {
                             calendar3.click();
                             selectDataMet = false;
-                        } else if(selectedDate3.equals("")) {
+                        } else if(selectedDate.equals("")) {
                             select1.selectByVisibleText(selectState3);
                             selectedState = select1.getFirstSelectedOption();
                             Thread.sleep(Long.parseLong(blankCalendarTimer));
-                            WebElement calendar4 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                            String selectedDate4 = calendar4.getAttribute("value");
+                            webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                            selectedDate = webElement.getAttribute("value");
 
-                            if (selectedDate4.equals("Select Date")) {
-                                calendar4.click();
+                            if (selectedDate.equals("Select Date")) {
+                                webElement.click();
                                 selectDataMet = false;
-                            } else if (selectedDate4.equals("")) {
+                            } else if (selectedDate.equals("")) {
                                 selectDataMet = true;
                             }
                         }
@@ -746,55 +699,55 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(sleepTimeCalendar));
             selectDate();
 
-            WebElement ofc = driver.findElement(By.xpath("(//label[@class='control-label'])[1]"));
-            String ofcPost = ofc.getText();
+            webElement = driver.findElement(By.xpath("(//label[@class='control-label'])[1]"));
+            String ofcPost = webElement.getText();
             if (ofcPost.equals("OFC Post")) {
 
-                WebElement element2 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
-                element2.click();
-                Select select2 = new Select(blankDropDown);
+                webElement = driver.findElement(By.xpath("//label[contains(text(),'')]"));
+                webElement.click();
+                Select select2 = new Select(webElement);
 
                 boolean selectDataMet2 = true;
 
                 while (selectDataMet2) {
                     select2.selectByVisibleText(selectState1);
                     selectedState = select2.getFirstSelectedOption();
-                    WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate2 = calendar2.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
 
                     // Compare the current date with the target date
-                    if (selectedDate2.equals("Select Date")) {
-                        calendar2.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet2 = false;
-                    } else if (selectedDate2.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         select2.selectByVisibleText(selectState2);
                         selectedState = select2.getFirstSelectedOption();
                         Thread.sleep(Long.parseLong(blankCalendarTimer));
-                        WebElement calendar1 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                        String selectedDate1 = calendar1.getAttribute("value");
+                        webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                        selectedDate = webElement.getAttribute("value");
 
-                        if (selectedDate1.equals("Select Date")) {
-                            calendar1.click();
+                        if (selectedDate.equals("Select Date")) {
+                            webElement.click();
                             selectDataMet2 = false;
-                        } else if (selectedDate1.equals("")) {
+                        } else if (selectedDate.equals("")) {
                             select2.selectByVisibleText(selectState3);
                             selectedState = select2.getFirstSelectedOption();
                             Thread.sleep(Long.parseLong(blankCalendarTimer));
-                            WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                            String selectedDate3 = calendar3.getAttribute("value");
+                            webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                            selectedDate = webElement.getAttribute("value");
 
-                            if (selectedDate3.equals("Select Date")) {
-                                calendar3.click();
+                            if (selectedDate.equals("Select Date")) {
+                                webElement.click();
                                 selectDataMet2 = false;
-                            } else if (selectedDate3.equals("")) {
+                            } else if (selectedDate.equals("")) {
                                 select2.selectByVisibleText(selectState);
                                 selectedState = select2.getFirstSelectedOption();
                                 Thread.sleep(Long.parseLong(blankCalendarTimer));
-                                WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                                String selectedDate = calendar.getAttribute("value");
+                                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                                selectedDate = webElement.getAttribute("value");
 
                                 if (selectedDate.equals("Select Date")) {
-                                    calendar.click();
+                                    webElement.click();
                                     selectDataMet2 = false;
                                 } else if (selectedDate.equals("")) {
                                     selectDataMet2 = true;
@@ -811,53 +764,53 @@ public class Main implements CommandLineRunner {
 //            third location
 
             if (ofcPost.equals("OFC Post")) {
-                WebElement element3 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
-                element3.click();
-                WebElement blankDropDown3 = driver.findElement(By.xpath("//select[@id='post_select']"));
-                Select select3 = new Select(blankDropDown3);
+                webElement = driver.findElement(By.xpath("//label[contains(text(),'')]"));
+                webElement.click();
+                blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+                Select select3 = new Select(blankDropDown);
 
                 boolean selectDataMet3 = true;
 
                 while (selectDataMet3) {
                     select3.selectByVisibleText(selectState2);
                     selectedState = select3.getFirstSelectedOption();
-                    WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate3 = calendar3.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate= webElement.getAttribute("value");
 
-                    if (selectedDate3.equals("Select Date")) {
-                        calendar3.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet3 = false;
-                    } else if (selectedDate3.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         select3.selectByVisibleText(selectState3);
                         selectedState = select3.getFirstSelectedOption();
                         Thread.sleep(Long.parseLong(blankCalendarTimer));
-                        WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                        String selectedDate2 = calendar2.getAttribute("value");
+                        webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                        selectedDate = webElement.getAttribute("value");
 
-                        if (selectedDate2.equals("Select Date")) {
-                            calendar2.click();
+                        if (selectedDate.equals("Select Date")) {
+                            webElement.click();
                             selectDataMet3 = false;
-                        } else if (selectedDate2.equals("")) {
+                        } else if (selectedDate.equals("")) {
                             select3.selectByVisibleText(selectState);
                             selectedState = select3.getFirstSelectedOption();
                             Thread.sleep(Long.parseLong(blankCalendarTimer));
-                            WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                            String selectedDate = calendar.getAttribute("value");
+                            webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                            selectedDate = webElement.getAttribute("value");
 
                             if (selectedDate.equals("Select Date")) {
-                                calendar.click();
+                                webElement.click();
                                 selectDataMet3 = false;
                             } else if (selectedDate.equals("")) {
                                 select3.selectByVisibleText(selectState1);
                                 selectedState = select3.getFirstSelectedOption();
                                 Thread.sleep(Long.parseLong(blankCalendarTimer));
-                                WebElement calendar1 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                                String selectedDate1 = calendar1.getAttribute("value");
+                                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                                selectedDate = webElement.getAttribute("value");
 
-                                if (selectedDate1.equals("Select Date")) {
-                                    calendar1.click();
+                                if (selectedDate.equals("Select Date")) {
+                                    webElement.click();
                                     selectDataMet3 = false;
-                                } else if (selectedDate1.equals("")) {
+                                } else if (selectedDate.equals("")) {
 
                                     selectDataMet3 = true;
                                 }
@@ -872,54 +825,54 @@ public class Main implements CommandLineRunner {
             }
 //            fourth location
             if (ofcPost.equals("OFC Post")) {
-                WebElement element4 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
-                element4.click();
-                WebElement blankDropDown4 = driver.findElement(By.xpath("//select[@id='post_select']"));
-                Select select4 = new Select(blankDropDown4);
+                webElement = driver.findElement(By.xpath("//label[contains(text(),'')]"));
+                webElement.click();
+                blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+                Select select4 = new Select(blankDropDown);
 
                 boolean selectDataMet4 = true;
 
                 while (selectDataMet4) {
                     select4.selectByVisibleText(selectState3);
                     selectedState = select4.getFirstSelectedOption();
-                    WebElement calendar4 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate4 = calendar4.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
 
                     // Compare the current date with the target date
-                    if (selectedDate4.equals("Select Date")) {
-                        calendar4.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet4 = false;
-                    } else if (selectedDate4.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         select4.selectByVisibleText(selectState);
                         selectedState = select4.getFirstSelectedOption();
                         Thread.sleep(Long.parseLong(blankCalendarTimer));
-                        WebElement calendar1 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                        String selectedDate1 = calendar1.getAttribute("value");
+                        webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                        selectedDate = webElement.getAttribute("value");
 
-                        if (selectedDate1.equals("Select Date")) {
-                            calendar1.click();
+                        if (selectedDate.equals("Select Date")) {
+                            webElement.click();
                             selectDataMet4 = false;
-                        } else if (selectedDate1.equals("")) {
+                        } else if (selectedDate.equals("")) {
                             select4.selectByVisibleText(selectState1);
                             selectedState = select4.getFirstSelectedOption();
                             Thread.sleep(Long.parseLong(blankCalendarTimer));
-                            WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                            String selectedDate2 = calendar2.getAttribute("value");
+                            webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                            selectedDate = webElement.getAttribute("value");
 
-                            if (selectedDate2.equals("Select Date")) {
-                                calendar2.click();
+                            if (selectedDate.equals("Select Date")) {
+                                webElement.click();
                                 selectDataMet4 = false;
-                            } else if (selectedDate2.equals("")) {
+                            } else if (selectedDate.equals("")) {
                                 select4.selectByVisibleText(selectState2);
                                 selectedState = select4.getFirstSelectedOption();
                                 Thread.sleep(Long.parseLong(blankCalendarTimer));
-                                WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                                String selectedDate3 = calendar3.getAttribute("value");
+                                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                                selectedDate = webElement.getAttribute("value");
 
-                                if (selectedDate3.equals("Select Date")) {
-                                    calendar3.click();
+                                if (selectedDate.equals("Select Date")) {
+                                    webElement.click();
                                     selectDataMet4 = false;
-                                } else if (selectedDate3.equals("")) {
+                                } else if (selectedDate.equals("")) {
                                     selectDataMet4 = true;
                                 }
                             }
@@ -933,54 +886,40 @@ public class Main implements CommandLineRunner {
             }
 
     } else if (switchLocation.equals("three")) {
-            driver.quit();
-            if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
-                ChromeOptions options = new ChromeOptions();
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new ChromeDriver(options);
-            } else if (browser.equals("firefox")) {
-                FirefoxOptions options = new FirefoxOptions();
-                options.addArguments("--start-debugger-server", "localhost:" + Integer.parseInt(port));
-                driver = new FirefoxDriver(options);
-            } else {
-                EdgeOptions options = new EdgeOptions();
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new EdgeDriver(options);
-            }
 
             //first state
-            WebElement element = driver.findElement(By.xpath("//label[contains(text(),'')]"));
-            element.click();
-            WebElement blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
-            Select select1 = new Select(blankDropDown);
+            webElement = driver.findElement(By.xpath("//label[contains(text(),'')]"));
+            webElement.click();
+            blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+            select1 = new Select(blankDropDown);
             boolean selectDataMet = true;
 
             while (selectDataMet) {
 
                 select1.selectByVisibleText(selectState);
                 selectedState = select1.getFirstSelectedOption();
-                WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate = calendar.getAttribute("value");
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
                 if (selectedDate.equals("Select Date")) {
-                    calendar.click();
+                    webElement.click();
                     selectDataMet = false;
                 } else if (selectedDate.equals("")) {
                     select1.selectByVisibleText(selectState1);
                     Thread.sleep(Long.parseLong(blankCalendarTimer));
-                    WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate2 = calendar2.getAttribute("value");
-                    if (selectedDate2.equals("Select Date")) {
-                        calendar2.click();
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet = false;
-                    } else if (selectedDate2.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         select1.selectByVisibleText(selectState2);
                         Thread.sleep(Long.parseLong(blankCalendarTimer));
-                        WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                        String selectedDate3 = calendar3.getAttribute("value");
-                        if (selectedDate3.equals("Select Date")) {
-                            calendar3.click();
+                        webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                        selectedDate = webElement.getAttribute("value");
+                        if (selectedDate.equals("Select Date")) {
+                            webElement.click();
                             selectDataMet = false;
-                        } else if (selectedDate3.equals("")) {
+                        } else if (selectedDate.equals("")) {
                             selectDataMet = true;
                         }
                     }
@@ -993,40 +932,40 @@ public class Main implements CommandLineRunner {
             selectDate();
 
 //            second location
-            WebElement ofc = driver.findElement(By.xpath("(//label[@class='control-label'])[1]"));
-            String ofcPost = ofc.getText();
+            webElement = driver.findElement(By.xpath("(//label[@class='control-label'])[1]"));
+            String ofcPost = webElement.getText();
             if (ofcPost.equals("OFC Post")) {
-                WebElement element2 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
-                element2.click();
+                webElement = driver.findElement(By.xpath("//label[contains(text(),'')]"));
+                webElement.click();
                 Select select2 = new Select(blankDropDown);
                 boolean selectDataMet2 = true;
 
                 while (selectDataMet2) {
                     select2.selectByVisibleText(selectState1);
                     selectedState = select2.getFirstSelectedOption();
-                    WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate2 = calendar2.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
                     // Compare the current date with the target date
-                    if (selectedDate2.equals("Select Date")) {
-                        calendar2.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet2 = false;
-                    } else if (selectedDate2.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         select2.selectByVisibleText(selectState2);
                         Thread.sleep(Long.parseLong(blankCalendarTimer));
-                        WebElement calendar1 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                        String selectedDate1 = calendar1.getAttribute("value");
-                        if (selectedDate1.equals("Select Date")) {
-                            calendar1.click();
+                        webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                        selectedDate = webElement.getAttribute("value");
+                        if (selectedDate.equals("Select Date")) {
+                            webElement.click();
                             selectDataMet2 = false;
-                        } else if (selectedDate1.equals("")) {
+                        } else if (selectedDate.equals("")) {
                             select2.selectByVisibleText(selectState);
                             Thread.sleep(Long.parseLong(blankCalendarTimer));
-                            WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                            String selectedDate3 = calendar3.getAttribute("value");
-                            if (selectedDate3.equals("Select Date")) {
-                                calendar3.click();
+                            webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                            selectedDate = webElement.getAttribute("value");
+                            if (selectedDate.equals("Select Date")) {
+                                webElement.click();
                                 selectDataMet2 = false;
-                            } else if (selectedDate3.equals("")) {
+                            } else if (selectedDate.equals("")) {
                                 selectDataMet2 = true;
                             }
                         }
@@ -1040,40 +979,40 @@ public class Main implements CommandLineRunner {
 
 //            third location
             if (ofcPost.equals("OFC Post")) {
-                WebElement element3 = driver.findElement(By.xpath("//label[contains(text(),'')]"));
-                element3.click();
-                WebElement blankDropDown3 = driver.findElement(By.xpath("//select[@id='post_select']"));
-                Select select3 = new Select(blankDropDown3);
+                webElement = driver.findElement(By.xpath("//label[contains(text(),'')]"));
+                webElement.click();
+                blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+                Select select3 = new Select(blankDropDown);
                 boolean selectDataMet3 = true;
 
                 while (selectDataMet3) {
                     select3.selectByVisibleText(selectState2);
                     selectedState = select3.getFirstSelectedOption();
-                    WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate3 = calendar3.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
 
-                    if (selectedDate3.equals("Select Date")) {
-                        calendar3.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet3 = false;
-                    } else if (selectedDate3.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         select3.selectByVisibleText(selectState);
                         Thread.sleep(Long.parseLong(blankCalendarTimer));
-                        WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                        String selectedDate2 = calendar2.getAttribute("value");
+                        webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                        selectedDate = webElement.getAttribute("value");
 
-                        if (selectedDate2.equals("Select Date")) {
-                            calendar2.click();
+                        if (selectedDate.equals("Select Date")) {
+                            webElement.click();
                             selectDataMet3 = false;
-                        } else if (selectedDate2.equals("")) {
+                        } else if (selectedDate.equals("")) {
                             select3.selectByVisibleText(selectState1);
                             Thread.sleep(Long.parseLong(blankCalendarTimer));
-                            WebElement calendar1 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                            String selectedDate1 = calendar1.getAttribute("value");
+                            webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                            selectedDate = webElement.getAttribute("value");
 
-                            if (selectedDate1.equals("Select Date")) {
-                                calendar1.click();
+                            if (selectedDate.equals("Select Date")) {
+                                webElement.click();
                                 selectDataMet3 = false;
-                            } else if (selectedDate1.equals("")) {
+                            } else if (selectedDate.equals("")) {
                                 selectDataMet3 = true;
                             }
                         }
@@ -1091,352 +1030,320 @@ public class Main implements CommandLineRunner {
 
 
     public void selectDate() throws InterruptedException {
-        //from Month
-        WebDriverWait fromMontElement = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement fromMonthElement = fromMontElement.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-        Select selectfromMonth = new Select(fromMonthElement);
-        selectfromMonth.selectByVisibleText(fromSelectMonth);
-        WebElement fromMonthElements = driver.findElement(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']"));
-        String fromMonth = fromMonthElements.getAttribute("value");
 
-        //from Year
-        WebDriverWait yearElement = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement fromYearElement = yearElement.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-        Select selectYear1 = new Select(fromYearElement);
-        selectYear1.selectByVisibleText(selectYear);
-        WebElement fromYearElements = driver.findElement(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']"));
-        String fromYear = fromYearElements.getAttribute("value");
-
-        //to Month
-        WebDriverWait montElement = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement toMonthElement = montElement.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-        Select selectMonth = new Select(toMonthElement);
-        selectMonth.selectByVisibleText(toSelectMonth);
-        WebElement toMonthElements = driver.findElement(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']"));
-        String toMonth = toMonthElements.getAttribute("value");
-
-        //to Year
-        WebDriverWait yearToElement = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement toYearElement = yearToElement.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-        Select toSelectYear1 = new Select(toYearElement);
-        toSelectYear1.selectByVisibleText(toSelectYear);
-        WebElement toYearElements = driver.findElement(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']"));
-        String toYear = toYearElements.getAttribute("value");
-
-
-        if (Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == 0 || Integer.parseInt(toYear) - Integer.parseInt(fromMonth) == 0) {
+        if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 0 || Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
             dateRange();
-        } else if (Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == 1 && Integer.parseInt(toYear) - Integer.parseInt(fromYear) == 0) {
-            WebDriverWait defaultMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultElement = defaultMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select defaultMonth = new Select(defaultElement);
-            defaultMonth.selectByVisibleText(fromSelectMonth);
+        } else if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 1 && Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(fromSelectMonth);
 
             dateRange();
 
-            WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select nextMonth = new Select(nextMonthElement);
-            nextMonth.selectByVisibleText(toSelectMonth);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(toSelectMonth);
 
             toDateRange();
-        } else if ((Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == -11) && (Integer.parseInt(toYear) - Integer.parseInt(fromYear) == 1)) {
-            WebDriverWait defaultMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultElement = defaultMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select defaultMonth = new Select(defaultElement);
-            defaultMonth.selectByVisibleText(fromSelectMonth);
+        } else if ((Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == -11) && (Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 1)) {
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(fromSelectMonth);
 
-            WebDriverWait defaultYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultYearElement = defaultYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select defaultYear = new Select(defaultYearElement);
-            defaultYear.selectByVisibleText(selectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(selectYear);
 
             dateRange();
 
-            WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select nextMonth = new Select(nextMonthElement);
-            nextMonth.selectByVisibleText(toSelectMonth);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(toSelectMonth);
 
-            WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select NextYear = new Select(nextYearElement);
-            NextYear.selectByVisibleText(toSelectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(toSelectYear);
 
             toDateRange();
-        } else if (Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == 2 && Integer.parseInt(toYear) - Integer.parseInt(fromYear) == 0) {
-            WebDriverWait defaultMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultElement = defaultMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select defaultMonth = new Select(defaultElement);
-            defaultMonth.selectByVisibleText(fromSelectMonth);
+        } else if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 2 && Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(fromSelectMonth);
 
             dateRange();
 
             //Click next Month Element
-            WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            secondElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
-            WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select nextMonth = new Select(nextMonthElement);
-            nextMonth.selectByVisibleText(toSelectMonth);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(toSelectMonth);
 
             toDateRange();
-        } else if (Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == 3 && Integer.parseInt(toYear) - Integer.parseInt(fromYear) == 0) {
-            WebDriverWait defaultMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultElement = defaultMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select defaultMonth = new Select(defaultElement);
-            defaultMonth.selectByVisibleText(fromSelectMonth);
+        } else if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 3 && Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(fromSelectMonth);
 
             dateRange();
 
             //Click next Month Element
-            WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            secondElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
             completeMonth();
 
             //Click next Month Element
-            WebDriverWait thirdMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            thirdElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
             completeThirdMonth();
 
-            WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select nextMonth = new Select(nextMonthElement);
-            nextMonth.selectByVisibleText(toSelectMonth);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(toSelectMonth);
 
             toDateRange();
-        } else if (Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == 4 && Integer.parseInt(toYear) - Integer.parseInt(fromYear) == 0) {
-            WebDriverWait defaultMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultElement = defaultMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select defaultMonth = new Select(defaultElement);
-            defaultMonth.selectByVisibleText(fromSelectMonth);
+        } else if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 4 && Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(fromSelectMonth);
 
             dateRange();
 
             //Click next Month Element
-            WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            secondElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
             completeMonth();
 
             //Click next Month Element
-            WebDriverWait thirdMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            thirdElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
             completeThirdMonth();
 
             //Click next Month Element
-            WebDriverWait fourthMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement fourthElement = fourthMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            fourthElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
-            WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select nextMonth = new Select(nextMonthElement);
-            nextMonth.selectByVisibleText(toSelectMonth);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(toSelectMonth);
 
             toDateRange();
-        } else if ((Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == -10) && (Integer.parseInt(toYear) - Integer.parseInt(fromYear) == 1)) {
-            WebDriverWait defaultMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultElement = defaultMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select defaultMonth = new Select(defaultElement);
-            defaultMonth.selectByVisibleText(fromSelectMonth);
+        } else if ((Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == -10) && (Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 1)) {
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(fromSelectMonth);
 
-            WebDriverWait defaultYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultYearElement = defaultYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select defaultYear = new Select(defaultYearElement);
-            defaultYear.selectByVisibleText(selectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(selectYear);
 
             dateRange();
 
             //Click next Month Element
-            WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            secondElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
-            WebDriverWait secondMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement second = secondMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonths = new Select(second);
-            WebElement textElement = secondMonths.getFirstSelectedOption();
-            String validateMonthElement = textElement.getText();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            webElement = month.getFirstSelectedOption();
+            String validateMonthElement = webElement.getText();
 
 
             if (!validateMonthElement.equals("Dec")) {
-                WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-                Select NextYear = new Select(nextYearElement);
-                NextYear.selectByVisibleText(toSelectYear);
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+                year = new Select(webElement);
+                year.selectByVisibleText(toSelectYear);
             }
 
             completeMonth();
 
-            WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select nextMonth = new Select(nextMonthElement);
-            nextMonth.selectByVisibleText(toSelectMonth);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(toSelectMonth);
 
-            WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select NextYear = new Select(nextYearElement);
-            NextYear.selectByVisibleText(toSelectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(toSelectYear);
 
             toDateRange();
-        } else if ((Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == -9) && (Integer.parseInt(toYear) - Integer.parseInt(fromYear) == 1)) {
-            WebDriverWait defaultMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultElement = defaultMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select defaultMonth = new Select(defaultElement);
-            defaultMonth.selectByVisibleText(fromSelectMonth);
+        } else if ((Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == -9) && (Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 1)) {
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(fromSelectMonth);
 
-            WebDriverWait defaultYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultYearElement = defaultYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select defaultYear = new Select(defaultYearElement);
-            defaultYear.selectByVisibleText(selectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(selectYear);
 
             dateRange();
 
             //Click next Month Element
-            WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            secondElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
-            WebDriverWait secondMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement second = secondMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonths = new Select(second);
-            WebElement textElement = secondMonths.getFirstSelectedOption();
-            String validateMonthElement = textElement.getText();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            webElement = month.getFirstSelectedOption();
+            String validateMonthElement = webElement.getText();
 
             if (!validateMonthElement.equals("Nov")) {
-                WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-                Select NextYear = new Select(nextYearElement);
-                NextYear.selectByVisibleText(toSelectYear);
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+                year = new Select(webElement);
+                year.selectByVisibleText(toSelectYear);
             }
 
             completeMonth();
 
-            WebDriverWait thirdMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            thirdElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
-            WebDriverWait thirdMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement third = thirdMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select thirdMonths = new Select(third);
-            WebElement thirdTextElement = thirdMonths.getFirstSelectedOption();
-            String validateThirdMonthElement = thirdTextElement.getText();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            webElement = month.getFirstSelectedOption();
+            String validateThirdMonthElement = webElement.getText();
 
 
             if (!validateThirdMonthElement.equals("Nov")) {
-                WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-                Select NextYear = new Select(nextYearElement);
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+                Select NextYear = new Select(webElement);
                 NextYear.selectByVisibleText(toSelectYear);
             }
 
             completeThirdMonth();
 
-            WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select nextMonth = new Select(nextMonthElement);
-            nextMonth.selectByVisibleText(toSelectMonth);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(toSelectMonth);
 
-            WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select NextYear = new Select(nextYearElement);
-            NextYear.selectByVisibleText(toSelectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(toSelectYear);
 
             toDateRange();
-        } else if ((Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == -8) && (Integer.parseInt(toYear) - Integer.parseInt(fromYear) == 1)) {
-            WebDriverWait defaultMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultElement = defaultMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select defaultMonth = new Select(defaultElement);
-            defaultMonth.selectByVisibleText(fromSelectMonth);
+        } else if ((Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == -8) && (Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 1)) {
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebElement defaultElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(defaultElement);
+            month.selectByVisibleText(fromSelectMonth);
 
-            WebDriverWait defaultYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultYearElement = defaultYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select defaultYear = new Select(defaultYearElement);
-            defaultYear.selectByVisibleText(selectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(selectYear);
 
             dateRange();
 
             //Click next Month Element
-            WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            secondElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
-            WebDriverWait secondMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement second = secondMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonths = new Select(second);
-            WebElement textElement = secondMonths.getFirstSelectedOption();
-            String validateMonthElement = textElement.getText();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            webElement = month.getFirstSelectedOption();
+            String validateMonthElement = webElement.getText();
 
 
             if (!validateMonthElement.equals("Oct")) {
-                WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-                Select NextYear = new Select(nextYearElement);
-                NextYear.selectByVisibleText(toSelectYear);
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+                year = new Select(webElement);
+                year.selectByVisibleText(toSelectYear);
             }
 
             completeMonth();
 
-            WebDriverWait thirdMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            thirdElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
-            WebDriverWait thirdMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement third = thirdMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select thirdMonths = new Select(third);
-            WebElement thirdTextElement = thirdMonths.getFirstSelectedOption();
-            String validateThirdMonthElement = thirdTextElement.getText();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            webElement = month.getFirstSelectedOption();
+            String validateThirdMonthElement = webElement.getText();
 
 
             if (!validateThirdMonthElement.equals("Nov")) {
-                WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-                Select NextYear = new Select(nextYearElement);
-                NextYear.selectByVisibleText(toSelectYear);
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+                year = new Select(webElement);
+                year.selectByVisibleText(toSelectYear);
             }
 
             completeThirdMonth();
 
-            WebDriverWait fourthMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement fourthElement = fourthMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            fourthElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
-            WebDriverWait fourthMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement fourth = fourthMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select fourthMonths = new Select(fourth);
-            WebElement fourthTextElement = fourthMonths.getFirstSelectedOption();
-            String validateFourthMonthElement = fourthTextElement.getText();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            webElement = month.getFirstSelectedOption();
+            String validateFourthMonthElement = webElement.getText();
 
 
             if (!validateFourthMonthElement.equals("Dec")) {
-                WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-                Select NextYear = new Select(nextYearElement);
-                NextYear.selectByVisibleText(toSelectYear);
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+                year = new Select(webElement);
+                year.selectByVisibleText(toSelectYear);
             }
 
 
             completeFourthMonth();
 
-            WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select nextMonth = new Select(nextMonthElement);
-            nextMonth.selectByVisibleText(toSelectMonth);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(toSelectMonth);
 
-            WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select NextYear = new Select(nextYearElement);
-            NextYear.selectByVisibleText(toSelectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(toSelectYear);
 
             toDateRange();
         }
@@ -1450,18 +1357,6 @@ public class Main implements CommandLineRunner {
         ChromeOptions options = new ChromeOptions();
         options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
         driver = new ChromeDriver(options);
-    }
-
-    public void openFireFoxBrowser() {
-        if (driver != null) {
-            driver.quit();
-        }
-
-        System.setProperty("webdriver.gecko.driver", "geckodriver.exe");
-        FirefoxOptions options = new FirefoxOptions();
-        options.setCapability("moz:debuggerAddress", "localhost:9222");
-        options.addArguments("debuggerAddress", "localhost:" + Integer.parseInt(port));
-        driver = new RemoteWebDriver(options);
     }
 
     public void openEdgeBrowser() {
@@ -1515,19 +1410,19 @@ public class Main implements CommandLineRunner {
             for (int date = fromDate; date <= lastDate; date++) {
 
                 try {
-                    WebElement dateElement = driver.findElement(By.xpath(String.format("//a[@data-date='%s']", date)));
-                    dateElement.click(); // click on the date
+                    webElement = driver.findElement(By.xpath(String.format("//a[@data-date='%s']", date)));
+                    webElement.click(); // click on the date
                     LocalDate timestamp = LocalDate.now();
                     System.out.println("the Ofc Page TimeStamp: {0}, This TimeStamp is selected." + timestamp);
-                    System.out.println("the Ofc Page TimeStamp: {0}, This TimeStamp is selected." + date);
-                    System.out.println("the Ofc Page TimeStamp: {0}, This TimeStamp is selected." + selectedState.getText());
-                    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(4));
-                    WebElement radioElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
-                        JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                        jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
-                        jsExecutor.executeScript("arguments[0].click();", radioElement);
+                    System.out.println("the Ofc Page date: {0}, This date is selected." + date);
+                    System.out.println("the Ofc Page state: {0}, This state is selected." + selectedState.getText());
+                    webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(4));
+                    webElement = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
+                        jsExecutor = (JavascriptExecutor) driver;
+                        jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
+                        jsExecutor.executeScript("arguments[0].click();", webElement);
                         driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                        playAudio("file_example_WAV_1MG.wav");
+                        playAudio("src/main/resources/file_example_WAV_1MG.wav");
                         selectStateConsularPosts();
 
                 } catch (NoSuchElementException exception) {
@@ -1541,19 +1436,19 @@ public class Main implements CommandLineRunner {
         } else {
             for (int date = fromDate; date <= toDate; date++) {
                 try {
-                    WebElement dateElement = driver.findElement(By.xpath(String.format("//a[@data-date='%s']", date)));
-                    dateElement.click(); // click on the date
+                    webElement = driver.findElement(By.xpath(String.format("//a[@data-date='%s']", date)));
+                    webElement.click(); // click on the date
                     LocalDate timestamp = LocalDate.now();
                     System.out.println("the Ofc Page TimeStamp: {0}, This TimeStamp is selected." + timestamp);
-                    System.out.println("the Ofc Page TimeStamp: {0}, This TimeStamp is selected." + date);
-                    System.out.println("the Ofc Page TimeStamp: {0}, This TimeStamp is selected." + selectedState.getText());
-                    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(4));
-                    WebElement radioElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
-                    JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                    jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
-                    jsExecutor.executeScript("arguments[0].click();", radioElement);
+                    System.out.println("the Ofc Page date: {0}, This Date is selected." + date);
+                    System.out.println("the Ofc Page state: {0}, This State is selected." + selectedState.getText());
+                    webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(4));
+                    webElement = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
+                    jsExecutor = (JavascriptExecutor) driver;
+                    jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
+                    jsExecutor.executeScript("arguments[0].click();", webElement);
                     driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                    playAudio("file_example_WAV_1MG.wav");
+                    playAudio("src/main/resources/file_example_WAV_1MG.wav");
                     selectStateConsularPosts();
 
                 } catch (NoSuchElementException exception) {
@@ -1570,13 +1465,13 @@ public class Main implements CommandLineRunner {
     }
 
     public void completeMonth() {
-        WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
-        String monthElement = secondElement.getAttribute("value");
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
+        String monthElement = webElement.getAttribute("value");
 
-        WebDriverWait secondYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement secondYearElement = secondYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
-        String yearElement = secondYearElement.getAttribute("value");
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
+        String yearElement = webElement.getAttribute("value");
 
 
         LocalDate endDate = LocalDate.of(Integer.parseInt(yearElement), Integer.parseInt(monthElement) + 1, Integer.parseInt(toDay));
@@ -1585,19 +1480,19 @@ public class Main implements CommandLineRunner {
         for (int date = 1; date <= endDay; date++) {
 
             try {
-                WebElement dateElement = driver.findElement(By.xpath(String.format("//a[@data-date='%s']", date)));
-                dateElement.click(); // click on the date
+                webElement = driver.findElement(By.xpath(String.format("//a[@data-date='%s']", date)));
+                webElement.click(); // click on the date
                 LocalDate timestamp = LocalDate.now();
                 System.out.println("the Ofc Page TimeStamp: {0}, This TimeStamp is selected." + timestamp);
                 System.out.println("the Ofc Page date: {0}, This date is selected." + date);
                 System.out.println("the Ofc Page state: {0}, This state is selected." + selectedState.getText());
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(4));
-                WebElement radioElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
-                    JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                    jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
-                    jsExecutor.executeScript("arguments[0].click();", radioElement);
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(4));
+                webElement = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
+                    jsExecutor = (JavascriptExecutor) driver;
+                    jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
+                    jsExecutor.executeScript("arguments[0].click();", webElement);
                     driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                    playAudio("file_example_WAV_1MG.wav");
+                    playAudio("src/main/resources/file_example_WAV_1MG.wav");
                     selectStateConsularPosts();
             } catch (NoSuchElementException exception) {
                 exception.getMessage();
@@ -1610,13 +1505,13 @@ public class Main implements CommandLineRunner {
 
     public void completeMonthForInterviewPage() {
 
-        WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
-        String monthElement = secondElement.getAttribute("value");
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
+        String monthElement = webElement.getAttribute("value");
 
-        WebDriverWait secondYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement secondYearElement = secondYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
-        String yearElement = secondYearElement.getAttribute("value");
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
+        String yearElement = webElement.getAttribute("value");
 
         LocalDate endDate = LocalDate.of(Integer.parseInt(yearElement), Integer.parseInt(monthElement) + 1, Integer.parseInt(toDay));
         int endDay = endDate.lengthOfMonth();
@@ -1624,20 +1519,20 @@ public class Main implements CommandLineRunner {
         for (int date = 1; date <= endDay; date++) {
 
             try {
-                WebElement dateElement = driver.findElement(By.xpath(String.format("//a[@data-date='%s']", date)));
-                dateElement.click(); // click on the date
+                webElement = driver.findElement(By.xpath(String.format("//a[@data-date='%s']", date)));
+                webElement.click(); // click on the date
                 LocalDate timestamp = LocalDate.now();
                 System.out.println("the Interview Page TimeStamp: {0}, This TimeStamp is selected." + timestamp);
                 System.out.println("the Interview Page date: {0}, This date is selected." + date);
                 System.out.println("the Interview Page state: {0}, This state is selected." + selectedState.getText());
 
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(4));
-                WebElement radioElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
-                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
-                jsExecutor.executeScript("arguments[0].click();", radioElement);
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(4));
+                webElement = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
+                jsExecutor = (JavascriptExecutor) driver;
+                jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
+                jsExecutor.executeScript("arguments[0].click();", webElement);
                 driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                playAudio("file_example_WAV_1MG.wav");
+                playAudio("src/main/resources/file_example_WAV_1MG.wav");
                 throw new RuntimeException("The Interview Date is selected as " + date);
             } catch (NoSuchElementException exception) {
                 exception.getMessage();
@@ -1647,13 +1542,13 @@ public class Main implements CommandLineRunner {
     }
 
     public void completeThirdMonth() {
-        WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
-        String monthElement = secondElement.getAttribute("value");
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
+        String monthElement = webElement.getAttribute("value");
 
-        WebDriverWait secondYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement secondYearElement = secondYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
-        String yearElement = secondYearElement.getAttribute("value");
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
+        String yearElement = webElement.getAttribute("value");
 
         LocalDate endDate = LocalDate.of(Integer.parseInt(yearElement), Integer.parseInt(monthElement) + 1, Integer.parseInt(toDay));
         int endDay = endDate.lengthOfMonth();
@@ -1661,21 +1556,21 @@ public class Main implements CommandLineRunner {
         for (int date = 1; date <= endDay; date++) {
 
             try {
-                WebElement dateElement = driver.findElement(By.xpath(String.format("//a[@data-date='%s']", date)));
-                dateElement.click(); // click on the date
+                webElement = driver.findElement(By.xpath(String.format("//a[@data-date='%s']", date)));
+                webElement.click(); // click on the date
                 LocalDate timestamp = LocalDate.now();
                 System.out.println("the Ofc Page TimeStamp: {0}, This TimeStamp is selected." + timestamp);
                 System.out.println("the Ofc Page date: {0}, This date is selected." + date);
                 System.out.println("the Ofc Page state: {0}, This state is selected." + selectedState.getText());
 
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(4));
-                WebElement radioElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(4));
+                webElement = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
 
-                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
-                jsExecutor.executeScript("arguments[0].click();", radioElement);
+                jsExecutor = (JavascriptExecutor) driver;
+                jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
+                jsExecutor.executeScript("arguments[0].click();", webElement);
                 driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                playAudio("file_example_WAV_1MG.wav");
+                playAudio("src/main/resources/file_example_WAV_1MG.wav");
                 selectStateConsularPosts();
             } catch (NoSuchElementException exception) {
                 exception.getMessage();
@@ -1688,13 +1583,13 @@ public class Main implements CommandLineRunner {
 
     public void completeThirdMonthForInterviewPage() {
 
-        WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
-        String monthElement = secondElement.getAttribute("value");
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
+        String monthElement = webElement.getAttribute("value");
 
-        WebDriverWait secondYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement secondYearElement = secondYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
-        String yearElement = secondYearElement.getAttribute("value");
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
+        String yearElement = webElement.getAttribute("value");
 
 
         LocalDate endDate = LocalDate.of(Integer.parseInt(yearElement), Integer.parseInt(monthElement) + 1, Integer.parseInt(toDay));
@@ -1703,21 +1598,21 @@ public class Main implements CommandLineRunner {
         for (int date = 1; date <= endDay; date++) {
 
             try {
-                WebElement dateElement = driver.findElement(By.xpath(String.format("//a[@data-date='%s']", date)));
-                dateElement.click(); // click on the date
+                webElement = driver.findElement(By.xpath(String.format("//a[@data-date='%s']", date)));
+                webElement.click(); // click on the date
                 LocalDate timestamp = LocalDate.now();
                 System.out.println("the Interview Page TimeStamp: {0}, This TimeStamp is selected." + timestamp);
                 System.out.println("the Interview Page date: {0}, This date is selected." + date);
                 System.out.println("the Interview Page state: {0}, This state is selected." + selectedState.getText());
 
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(4));
-                WebElement radioElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(4));
+                webElement = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
 
-                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
-                jsExecutor.executeScript("arguments[0].click();", radioElement);
+                jsExecutor = (JavascriptExecutor) driver;
+                jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
+                jsExecutor.executeScript("arguments[0].click();", webElement);
                 driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                playAudio("file_example_WAV_1MG.wav");
+                playAudio("src/main/resources/file_example_WAV_1MG.wav");
                 throw new RuntimeException("The Interview Date is selected as " + date);
 
             } catch (NoSuchElementException exception) {
@@ -1729,12 +1624,12 @@ public class Main implements CommandLineRunner {
 
     public void completeFourthMonth() {
 
-        WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
         String monthElement = secondElement.getAttribute("value");
 
-        WebDriverWait secondYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement secondYearElement = secondYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondYearElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
         String yearElement = secondYearElement.getAttribute("value");
 
         LocalDate endDate = LocalDate.of(Integer.parseInt(yearElement), Integer.parseInt(monthElement) + 1, Integer.parseInt(toDay));
@@ -1750,13 +1645,13 @@ public class Main implements CommandLineRunner {
                 System.out.println("the Ofc Page date: {0}, This date is selected." + date);
                 System.out.println("the Ofc Page state: {0}, This state is selected." + selectedState.getText());
 
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(4));
-                WebElement radioElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
-                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(4));
+                WebElement radioElement = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
+                jsExecutor = (JavascriptExecutor) driver;
                 jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                 jsExecutor.executeScript("arguments[0].click();", radioElement);
                 driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                playAudio("file_example_WAV_1MG.wav");
+                playAudio("src/main/resources/file_example_WAV_1MG.wav");
                 selectStateConsularPosts();
 
             } catch (NoSuchElementException exception) {
@@ -1770,12 +1665,12 @@ public class Main implements CommandLineRunner {
 
     public void completeFourthMonthForInterviewPage() {
 
-        WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
         String monthElement = secondElement.getAttribute("value");
 
-        WebDriverWait secondYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement secondYearElement = secondYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondYearElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
         String yearElement = secondYearElement.getAttribute("value");
 
         LocalDate endDate = LocalDate.of(Integer.parseInt(yearElement), Integer.parseInt(monthElement) + 1, Integer.parseInt(toDay));
@@ -1791,13 +1686,13 @@ public class Main implements CommandLineRunner {
                 System.out.println("the Interview Page date: {0}, This date is selected." + date);
                 System.out.println("the Interview Page state: {0}, This state is selected." + selectedState.getText());
 
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(4));
-                WebElement radioElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
-                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(4));
+                WebElement radioElement = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
+                jsExecutor = (JavascriptExecutor) driver;
                 jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                 jsExecutor.executeScript("arguments[0].click();", radioElement);
                 driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                playAudio("file_example_WAV_1MG.wav");
+                playAudio("src/main/resources/file_example_WAV_1MG.wav");
                 throw new RuntimeException("The Interview Date is selected as " + date);
 
             } catch (NoSuchElementException exception) {
@@ -1809,12 +1704,12 @@ public class Main implements CommandLineRunner {
 
     public void completeFifthMonth() {
 
-        WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']")));
         String monthElement = secondElement.getAttribute("value");
 
-        WebDriverWait secondYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement secondYearElement = secondYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement secondYearElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']")));
         String yearElement = secondYearElement.getAttribute("value");
 
         LocalDate endDate = LocalDate.of(Integer.parseInt(yearElement), Integer.parseInt(monthElement) + 1, Integer.parseInt(toDay));
@@ -1829,13 +1724,13 @@ public class Main implements CommandLineRunner {
                 System.out.println("the Ofc Page TimeStamp: {0}, This TimeStamp is selected." + timestamp);
                 System.out.println("the Ofc Page date: {0}, This date is selected." + date);
                 System.out.println("the Ofc Page state: {0}, This state is selected." + selectedState.getText());
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(4));
-                WebElement radioElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
-                JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(4));
+                WebElement radioElement = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
+                jsExecutor = (JavascriptExecutor) driver;
                 jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                 jsExecutor.executeScript("arguments[0].click();", radioElement);
                 driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                playAudio("file_example_WAV_1MG.wav");
+                playAudio("src/main/resources/file_example_WAV_1MG.wav");
                 selectStateConsularPosts();
             } catch (NoSuchElementException exception) {
                 exception.getMessage();
@@ -1859,14 +1754,14 @@ public class Main implements CommandLineRunner {
                 System.out.println("the Ofc Page date: {0}, This date is selected." + date);
                 System.out.println("the Ofc Page state: {0}, This state is selected." + selectedState.getText());
 
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement radioElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                WebElement radioElement = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
 
-                    JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                    jsExecutor = (JavascriptExecutor) driver;
                     jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                     jsExecutor.executeScript("arguments[0].click();", radioElement);
                     driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                    playAudio("file_example_WAV_1MG.wav");
+                    playAudio("src/main/resources/file_example_WAV_1MG.wav");
                     selectStateConsularPosts();
 
             } catch (NoSuchElementException exception) {
@@ -1880,51 +1775,44 @@ public class Main implements CommandLineRunner {
 
     public void selectStateConsularPosts() throws InterruptedException {
 
+        driver.quit();
+        if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
+            openChromeBrowser();
+        } else {
+            openEdgeBrowser();
+        }
+
         String number = numberInterview;
 
-        WebDriverWait fromMontElement = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement nameElement=fromMontElement.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//ul[@id='gm_select']//li//label")));
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement nameElement=webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//ul[@id='gm_select']//li//label")));
         if (nameElement.getText()!=null) {
 
         if (number.equals("one")) {
-            driver.quit();
-             if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
-                ChromeOptions options = new ChromeOptions();
-                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new ChromeDriver(options);
-            } else if (browser.equals("firefox")) {
-                FirefoxOptions options = new FirefoxOptions();
-                options.addArguments("--start-debugger-server", "localhost:" + Integer.parseInt(port));
-                driver = new FirefoxDriver(options);
-            } else {
-                EdgeOptions options = new EdgeOptions();
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new EdgeDriver(options);
-            }
 
-            WebElement blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
-            Select select1 = new Select(blankDropDown);
+             blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+             select1 = new Select(blankDropDown);
 
             boolean selectDataMet = true;
 
             while (selectDataMet) {
                 Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-                element.click();
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+                webElement.click();
                 select1.selectByVisibleText(interviewState);
                 selectedState = select1.getFirstSelectedOption();
-                WebDriverWait wait1 = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement element1 = wait1.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-                element1.click();
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+                webElement.click();
                 Thread.sleep(Long.parseLong(blankCalendarTimer));
-                WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate = calendar.getAttribute("value");
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
 
                 if (selectedDate.equals("Select Date")) {
-                    calendar.click();
+                    webElement.click();
                     if (!driver.findElement(By.xpath("//div[@id='ui-datepicker-div']")).isDisplayed()) {
-                        calendar.click();
+                        webElement.click();
                     }
                     selectDataMet = false;
                 } else {
@@ -1936,53 +1824,38 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(sleepTimeCalendar));
             selectDateInterviewPage();
         } else if (number.equals("two")) {
-            driver.quit();
-             if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
-                ChromeOptions options = new ChromeOptions();
-                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new ChromeDriver(options);
-            } else if (browser.equals("firefox")) {
-                FirefoxOptions options = new FirefoxOptions();
-                 
-                options.addArguments("--start-debugger-server", "localhost:" + Integer.parseInt(port));
-                driver = new FirefoxDriver(options);
-            } else {
-                EdgeOptions options = new EdgeOptions();
-                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new EdgeDriver(options);
-            }
 
             //first state
-            WebDriverWait wait14 = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement element14 = wait14.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-            element14.click();
-            WebElement blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
-            Select select1 = new Select(blankDropDown);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+            webElement.click();
+            blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+            select1 = new Select(blankDropDown);
 
             boolean selectDataMet = true;
 
             while (selectDataMet) {
                 select1.selectByVisibleText(interviewState);
                 selectedState = select1.getFirstSelectedOption();
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-                element.click();
-                WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate = calendar.getAttribute("value");
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+                webElement.click();
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
 
                 if (selectedDate.equals("Select Date")) {
-                    calendar.click();
+                    webElement.click();
                     selectDataMet = false;
                 } else if(selectedDate.equals("")) {
                     select1.selectByVisibleText(interviewState1);
                     Thread.sleep(Long.parseLong(blankCalendarTimer));
-                    WebElement calendar1 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate1 = calendar1.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
 
-                    if (selectedDate1.equals("Select Date")) {
-                        calendar.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet = false;
-                    } else if (selectedDate1.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
                         selectDataMet = true;
                     }
@@ -1995,31 +1868,31 @@ public class Main implements CommandLineRunner {
             selectDateInterviewPage();
 
 //         2nd location
-            WebDriverWait wait23 = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement element23 = wait23.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-            element23.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+            webElement.click();
             boolean selectDataMet1 = true;
 
 
             while (selectDataMet1) {
                 select1.selectByVisibleText(interviewState1);
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-                element.click();
-                WebElement calendar = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate = calendar.getAttribute("value");
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+                webElement.click();
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
                 if (selectedDate.equals("Select Date")) {
-                    calendar.click();
+                    webElement.click();
                     selectDataMet1 = false;
                 } else if(selectedDate.equals("")) {
                     select1.selectByVisibleText(interviewState);
                     Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
-                    WebElement calendar1 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate1 = calendar1.getAttribute("value");
-                    if (selectedDate1.equals("Select Date")) {
-                        calendar.click();
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet1 = false;
-                    } else if(selectedDate1.equals("")) {
+                    } else if(selectedDate.equals("")) {
                         Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
                         selectDataMet1 = true;
                     }
@@ -2032,28 +1905,12 @@ public class Main implements CommandLineRunner {
             selectDateInterviewPage();
 
         } else if (number.equals("five")) {
-            driver.quit();
-             if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
-                ChromeOptions options = new ChromeOptions();
-                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new ChromeDriver(options);
-            } else if (browser.equals("firefox")) {
-                FirefoxOptions options = new FirefoxOptions();
-                 
-                options.addArguments("--start-debugger-server", "localhost:" + Integer.parseInt(port));
-                driver = new FirefoxDriver(options);
-            } else {
-                EdgeOptions options = new EdgeOptions();
-                 
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new EdgeDriver(options);
-            }
             //first state
-            WebDriverWait wait13 = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement element13 = wait13.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-            element13.click();
-            WebElement blankDropDown1 = driver.findElement(By.xpath("//select[@id='post_select']"));
-            Select select1 = new Select(blankDropDown1);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+            webElement.click();
+            blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+            select1 = new Select(blankDropDown);
 
             boolean selectDataMet1 = true;
 
@@ -2061,26 +1918,26 @@ public class Main implements CommandLineRunner {
 
                 select1.selectByVisibleText(interviewState);
                 selectedState = select1.getFirstSelectedOption();
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-                element.click();
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+                webElement.click();
 
-                WebElement calendar1 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate1 = calendar1.getAttribute("value");
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
 
 
-                if (selectedDate1.equals("Select Date")) {
-                    calendar1.click();
+                if (selectedDate.equals("Select Date")) {
+                    webElement.click();
                     selectDataMet1 = false;
-                } else if(selectedDate1.equals("")) {
+                } else if(selectedDate.equals("")) {
                     select1.selectByVisibleText(interviewState1);
                     Thread.sleep(Long.parseLong(blankCalendarTimer));
-                    WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate2 = calendar2.getAttribute("value");
-                    if (selectedDate2.equals("Select Date")) {
-                        calendar2.click();
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet1 = false;
-                    } else if(selectedDate2.equals("")) {
+                    } else if(selectedDate.equals("")) {
                         Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
                         selectDataMet1 = true;
                     }
@@ -2095,11 +1952,11 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
 
             //second state
-            WebDriverWait wait22 = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement element22 = wait22.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-            element22.click();
-            WebElement blankDropDown2 = driver.findElement(By.xpath("//select[@id='post_select']"));
-            Select select2 = new Select(blankDropDown2);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+            webElement.click();
+            blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+            Select select2 = new Select(blankDropDown);
 
             boolean selectDataMet2 = true;
 
@@ -2107,26 +1964,26 @@ public class Main implements CommandLineRunner {
 
                 select2.selectByVisibleText(interviewState1);
                 selectedState = select2.getFirstSelectedOption();
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-                element.click();
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+                webElement.click();
 
-                WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate2 = calendar2.getAttribute("value");
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
 
-                if (selectedDate2.equals("Select Date")) {
-                    calendar2.click();
+                if (selectedDate.equals("Select Date")) {
+                    webElement.click();
                     selectDataMet2 = false;
-                } else if(selectedDate2.equals("")) {
+                } else if(selectedDate.equals("")) {
                     select2.selectByVisibleText(interviewState2);
                     Thread.sleep(Long.parseLong(blankCalendarTimer));
-                    WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate3 = calendar3.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
 
-                    if (selectedDate3.equals("Select Date")) {
-                        calendar3.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet2 = false;
-                    } else if(selectedDate3.equals("")) {
+                    } else if(selectedDate.equals("")) {
                         Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
                         selectDataMet2 = true;
                     }
@@ -2140,12 +1997,12 @@ public class Main implements CommandLineRunner {
 
         Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
 
-        //third state
-        WebDriverWait wait32 = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement element32 = wait32.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-        element32.click();
-        WebElement blankDropDown3 = driver.findElement(By.xpath("//select[@id='post_select']"));
-        Select select3 = new Select(blankDropDown3);
+        //third stat
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+        webElement.click();
+        blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+        Select select3 = new Select(blankDropDown);
 
         boolean selectDataMet3 = true;
 
@@ -2153,25 +2010,25 @@ public class Main implements CommandLineRunner {
 
             select3.selectByVisibleText(interviewState2);
             selectedState = select3.getFirstSelectedOption();
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-            element.click();
-            WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-            String selectedDate3 = calendar3.getAttribute("value");
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+            webElement.click();
+            webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+            selectedDate = webElement.getAttribute("value");
 
-            if (selectedDate3.equals("Select Date")) {
-                calendar3.click();
+            if (selectedDate.equals("Select Date")) {
+                webElement.click();
                 selectDataMet3 = false;
-            } else if(selectedDate3.equals("")) {
+            } else if(selectedDate.equals("")) {
                 select3.selectByVisibleText(interviewState3);
                Thread.sleep(Long.parseLong(blankCalendarTimer));
-                WebElement calendar4 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate4 = calendar4.getAttribute("value");
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
 
-                if (selectedDate4.equals("Select Date")) {
-                    calendar4.click();
+                if (selectedDate.equals("Select Date")) {
+                    webElement.click();
                     selectDataMet3 = false;
-                } else if(selectedDate4.equals("")) {
+                } else if(selectedDate.equals("")) {
                     Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
                     selectDataMet3 = true;
                 }
@@ -2186,11 +2043,11 @@ public class Main implements CommandLineRunner {
         Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
 
         //fourth state
-        WebDriverWait wait41 = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement element41 = wait41.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-        element41.click();
-        WebElement blankDropDown4 = driver.findElement(By.xpath("//select[@id='post_select']"));
-        Select select4 = new Select(blankDropDown4);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+            webElement.click();
+        blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+        Select select4 = new Select(blankDropDown);
 
         boolean selectDataMet4 = true;
 
@@ -2198,26 +2055,26 @@ public class Main implements CommandLineRunner {
 
             select4.selectByVisibleText(interviewState3);
             selectedState = select4.getFirstSelectedOption();
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-            element.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+            webElement.click();
 
-            WebElement calendar4 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-            String selectedDate4 = calendar4.getAttribute("value");
+            webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+            selectedDate = webElement.getAttribute("value");
 
-            if (selectedDate4.equals("Select Date")) {
-                calendar4.click();
+            if (selectedDate.equals("Select Date")) {
+                webElement.click();
                 selectDataMet4 = false;
-            } else if(selectedDate4.equals("")) {
+            } else if(selectedDate.equals("")) {
                 select4.selectByVisibleText(interviewState4);
                 Thread.sleep(Long.parseLong(blankCalendarTimer));
-                WebElement calendar5 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate5 = calendar5.getAttribute("value");
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
 
-                if (selectedDate5.equals("Select Date")) {
-                    calendar5.click();
+                if (selectedDate.equals("Select Date")) {
+                    webElement.click();
                     selectDataMet4 = false;
-                } else if (selectedDate5.equals("")) {
+                } else if (selectedDate.equals("")) {
                     Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
                     selectDataMet4 = true;
                 }
@@ -2232,38 +2089,38 @@ public class Main implements CommandLineRunner {
         Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
 
         //fifth state
-        WebDriverWait wait51 = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement element51 = wait51.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-        element51.click();
-        WebElement blankDropDown5 = driver.findElement(By.xpath("//select[@id='post_select']"));
-        Select select5 = new Select(blankDropDown5);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+            webElement.click();
+        blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+        Select select5 = new Select(blankDropDown);
 
         boolean selectDataMet5 = true;
 
         while (selectDataMet5) {
             select5.selectByVisibleText(interviewState4);
             selectedState = select5.getFirstSelectedOption();
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-            element.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+            webElement.click();
 
-            WebElement calendar5 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-            String selectedDate5 = calendar5.getAttribute("value");
+            webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+            selectedDate = webElement.getAttribute("value");
 
             // Compare the current date with the target date
-            if (selectedDate5.equals("Select Date")) {
-                calendar5.click();
+            if (selectedDate.equals("Select Date")) {
+                webElement.click();
                 selectDataMet5 = false;
-            } else if(selectedDate5.equals("")) {
+            } else if(selectedDate.equals("")) {
                 select5.selectByVisibleText(interviewState);
                Thread.sleep(Long.parseLong(blankCalendarTimer));
-                WebElement calendar1 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate1 = calendar1.getAttribute("value");
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
 
-                if (selectedDate1.equals("Select Date")) {
-                    calendar1.click();
+                if (selectedDate.equals("Select Date")) {
+                    webElement.click();
                     selectDataMet5 = false;
-                } else if (selectedDate1.equals("")) {
+                } else if (selectedDate.equals("")) {
                     Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
                     selectDataMet5 = true;
                 }
@@ -2276,54 +2133,39 @@ public class Main implements CommandLineRunner {
         selectDateInterviewPage();
         Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
     } else if(number.equals("four")) {
-            driver.quit();
-             if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
-                ChromeOptions options = new ChromeOptions();
-                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new ChromeDriver(options);
-            } else if (browser.equals("firefox")) {
-                FirefoxOptions options = new FirefoxOptions();
-                 
-                options.addArguments("--start-debugger-server", "localhost:" + Integer.parseInt(port));
-                driver = new FirefoxDriver(options);
-            } else {
-                EdgeOptions options = new EdgeOptions();
-                 options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new EdgeDriver(options);
-            }
 
             //first state
-            WebDriverWait wait12 = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement element12 = wait12.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-            element12.click();
-            WebElement blankDropDown1 = driver.findElement(By.xpath("//select[@id='post_select']"));
-            Select select1 = new Select(blankDropDown1);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+            webElement.click();
+            blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+            select1 = new Select(blankDropDown);
 
             boolean selectDataMet1 = true;
 
             while (selectDataMet1) {
                 select1.selectByVisibleText(interviewState);
                 selectedState = select1.getFirstSelectedOption();
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-                element.click();
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+                webElement.click();
 
-                WebElement calendar1 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate1 = calendar1.getAttribute("value");
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
 
-                if (selectedDate1.equals("Select Date")) {
-                    calendar1.click();
+                if (selectedDate.equals("Select Date")) {
+                    webElement.click();
                     selectDataMet1 = false;
-                } else if(selectedDate1.equals("")) {
+                } else if(selectedDate.equals("")) {
                     select1.selectByVisibleText(interviewState1);
                    Thread.sleep(Long.parseLong(blankCalendarTimer));
-                    WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate2 = calendar2.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
 
-                    if (selectedDate2.equals("Select Date")) {
-                        calendar2.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet1 = false;
-                    } else if (selectedDate2.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
                         selectDataMet1 = true;
                     }
@@ -2336,36 +2178,36 @@ public class Main implements CommandLineRunner {
             selectDateInterviewPage();
 
             //second state
-            WebDriverWait wait22 = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement element22 = wait22.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-            element22.click();
-            WebElement blankDropDown2 = driver.findElement(By.xpath("//select[@id='post_select']"));
-            Select select2 = new Select(blankDropDown2);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+            webElement.click();
+            blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+            Select select2 = new Select(blankDropDown);
             boolean selectDataMet2 = true;
 
             while (selectDataMet2) {
                 select2.selectByVisibleText(interviewState1);
                 selectedState = select2.getFirstSelectedOption();
-                WebDriverWait wait21 = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement element21 = wait21.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-                element21.click();
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+                webElement.click();
 
-                WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate2 = calendar2.getAttribute("value");
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
 
-                if (selectedDate2.equals("Select Date")) {
-                    calendar2.click();
+                if (selectedDate.equals("Select Date")) {
+                    webElement.click();
                     selectDataMet2 = false;
-                } else if(selectedDate2.equals("")) {
+                } else if(selectedDate.equals("")) {
                     select2.selectByVisibleText(interviewState2);
                   Thread.sleep(Long.parseLong(blankCalendarTimer));
-                    WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate3 = calendar3.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
 
-                    if (selectedDate3.equals("Select Date")) {
-                        calendar3.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet2 = false;
-                    } else if(selectedDate3.equals("")) {
+                    } else if(selectedDate.equals("")) {
                         Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
                         selectDataMet2 = true;
                     }
@@ -2380,37 +2222,37 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
 
             //third state
-            WebDriverWait wait31 = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement element31 = wait31.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-            element31.click();
-            WebElement blankDropDown3 = driver.findElement(By.xpath("//select[@id='post_select']"));
-            Select select3 = new Select(blankDropDown3);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+            webElement.click();
+            blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+            Select select3 = new Select(blankDropDown);
 
             boolean selectDataMet3 = true;
 
             while (selectDataMet3) {
                 select3.selectByVisibleText(interviewState2);
                 selectedState = select3.getFirstSelectedOption();
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-                element.click();
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+                webElement.click();
 
-                WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate3 = calendar3.getAttribute("value");
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate= webElement.getAttribute("value");
 
-                if (selectedDate3.equals("Select Date")) {
-                    calendar3.click();
+                if (selectedDate.equals("Select Date")) {
+                    webElement.click();
                     selectDataMet3 = false;
-                } else if(selectedDate3.equals("")) {
+                } else if(selectedDate.equals("")) {
                     select3.selectByVisibleText(interviewState3);
                   Thread.sleep(Long.parseLong(blankCalendarTimer));
-                    WebElement calendar4 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate4 = calendar4.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
 
-                    if (selectedDate4.equals("Select Date")) {
-                        calendar4.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet3 = false;
-                    } else if (selectedDate4.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
                         selectDataMet3 = true;
                     }
@@ -2425,37 +2267,37 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
 
             //fourth state
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-            element.click();
-            WebElement blankDropDown4 = driver.findElement(By.xpath("//select[@id='post_select']"));
-            Select select4 = new Select(blankDropDown4);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+            webElement.click();
+            blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+            Select select4 = new Select(blankDropDown);
 
             boolean selectDataMet4 = true;
 
             while (selectDataMet4) {
                 select4.selectByVisibleText(interviewState3);
                 selectedState = select4.getFirstSelectedOption();
-                WebDriverWait wait4 = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement element4 = wait4.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-                element4.click();
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+                webElement.click();
 
-                WebElement calendar4 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate4 = calendar4.getAttribute("value");
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
 
-                if (selectedDate4.equals("Select Date")) {
-                    calendar4.click();
+                if (selectedDate.equals("Select Date")) {
+                    webElement.click();
                     selectDataMet4 = false;
-                } else if(selectedDate4.equals("")) {
+                } else if(selectedDate.equals("")) {
                     select4.selectByVisibleText(interviewState);
                   Thread.sleep(Long.parseLong(blankCalendarTimer));
-                    WebElement calendar5 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate5 = calendar5.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
 
-                    if (selectedDate5.equals("Select Date")) {
-                        calendar5.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet4 = false;
-                    } else if(selectedDate5.equals("")) {
+                    } else if(selectedDate.equals("")) {
                         Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
                         selectDataMet4 = true;
                     }
@@ -2469,52 +2311,38 @@ public class Main implements CommandLineRunner {
 
             Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
         } else if (number.equals("three")) {
-            driver.quit();
-            if (browser.equals("chrome") || browser.equals("chromium") || browser.equals("brave")) {
-                ChromeOptions options = new ChromeOptions();
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new ChromeDriver(options);
-            } else if (browser.equals("firefox")) {
-                FirefoxOptions options = new FirefoxOptions();
-                options.addArguments("--start-debugger-server", "localhost:" + Integer.parseInt(port));
-                driver = new FirefoxDriver(options);
-            } else {
-                EdgeOptions options = new EdgeOptions();
-                options.setExperimentalOption("debuggerAddress", "localhost:" + Integer.parseInt(port));
-                driver = new EdgeDriver(options);
-            }
 
             //first state
-            WebDriverWait wait5 = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement element5 = wait5.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-            element5.click();
-            WebElement blankDropDown1 = driver.findElement(By.xpath("//select[@id='post_select']"));
-            Select select1 = new Select(blankDropDown1);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+            webElement.click();
+            blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+            select1 = new Select(blankDropDown);
             boolean selectDataMet1 = true;
 
             while (selectDataMet1) {
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-                element.click();
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+                webElement.click();
                 select1.selectByVisibleText(interviewState);
                 selectedState = select1.getFirstSelectedOption();
 
-                WebElement calendar1 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate1 = calendar1.getAttribute("value");
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
 
-                if (selectedDate1.equals("Select Date")) {
-                    calendar1.click();
+                if (selectedDate.equals("Select Date")) {
+                    webElement.click();
                     selectDataMet1 = false;
-                } else if (selectedDate1.equals("")) {
+                } else if (selectedDate.equals("")) {
                     select1.selectByVisibleText(interviewState1);
                     Thread.sleep(Long.parseLong(blankCalendarTimer));
-                    WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate2 = calendar2.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
 
-                    if (selectedDate2.equals("Select Date")) {
-                        calendar2.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet1 = false;
-                    } else if (selectedDate2.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
                         selectDataMet1 = true;
                     }
@@ -2529,11 +2357,11 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
 
             //second state
-            WebDriverWait wait12 = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement element12 = wait12.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-            element12.click();
-            WebElement blankDropDown2 = driver.findElement(By.xpath("//select[@id='post_select']"));
-            Select select2 = new Select(blankDropDown2);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+            webElement.click();
+            blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+            Select select2 = new Select(blankDropDown);
 
             boolean selectDataMet2 = true;
 
@@ -2541,26 +2369,26 @@ public class Main implements CommandLineRunner {
 
                 select2.selectByVisibleText(interviewState1);
                 selectedState = select2.getFirstSelectedOption();
-                WebDriverWait wait2 = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement element2 = wait2.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-                element2.click();
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+                webElement.click();
 
-                WebElement calendar2 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate2 = calendar2.getAttribute("value");
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
 
-                if (selectedDate2.equals("Select Date")) {
-                    calendar2.click();
+                if (selectedDate.equals("Select Date")) {
+                    webElement.click();
                     selectDataMet2 = false;
-                } else if (selectedDate2.equals("")) {
+                } else if (selectedDate.equals("")) {
                     select2.selectByVisibleText(interviewState2);
                     Thread.sleep(Long.parseLong(blankCalendarTimer));
-                    WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate3 = calendar3.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
 
-                    if (selectedDate3.equals("Select Date")) {
-                        calendar3.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet2 = false;
-                    } else if (selectedDate3.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
                         selectDataMet2 = true;
                     }
@@ -2575,11 +2403,11 @@ public class Main implements CommandLineRunner {
             Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
 
             //third state
-            WebDriverWait wait3 = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement element3 = wait3.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-            element3.click();
-            WebElement blankDropDown3 = driver.findElement(By.xpath("//select[@id='post_select']"));
-            Select select3 = new Select(blankDropDown3);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+            webElement.click();
+            blankDropDown = driver.findElement(By.xpath("//select[@id='post_select']"));
+            Select select3 = new Select(blankDropDown);
 
             boolean selectDataMet3 = true;
 
@@ -2587,25 +2415,25 @@ public class Main implements CommandLineRunner {
 
                 select3.selectByVisibleText(interviewState2);
                 selectedState = select3.getFirstSelectedOption();
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
-                element.click();
-                WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                String selectedDate3 = calendar3.getAttribute("value");
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[contains(text(),'Return to top')]")));
+                webElement.click();
+                webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                selectedDate = webElement.getAttribute("value");
 
-                if (selectedDate3.equals("Select Date")) {
-                    calendar3.click();
+                if (selectedDate.equals("Select Date")) {
+                    webElement.click();
                     selectDataMet3 = false;
-                } else if (selectedDate3.equals("")) {
+                } else if (selectedDate.equals("")) {
                     select3.selectByVisibleText(interviewState);
                     Thread.sleep(Long.parseLong(blankCalendarTimer));
-                    WebElement calendar4 = driver.findElement(By.xpath("//input[@id='datepicker']"));
-                    String selectedDate4 = calendar4.getAttribute("value");
+                    webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
+                    selectedDate = webElement.getAttribute("value");
 
-                    if (selectedDate4.equals("Select Date")) {
-                        calendar4.click();
+                    if (selectedDate.equals("Select Date")) {
+                        webElement.click();
                         selectDataMet3 = false;
-                    } else if (selectedDate4.equals("")) {
+                    } else if (selectedDate.equals("")) {
                         Thread.sleep(Long.parseLong(stateSleepTimeCalendar));
                         selectDataMet3 = true;
                     }
@@ -2624,369 +2452,337 @@ public class Main implements CommandLineRunner {
     }
 
     public void selectDateInterviewPage() throws InterruptedException {
-        //from Month
-        WebDriverWait fromMontElement = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement fromMonthElement = fromMontElement.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-        Select selectfromMonth = new Select(fromMonthElement);
-        selectfromMonth.selectByVisibleText(fromSelectMonth);
-        WebElement fromMonthElements = driver.findElement(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']"));
-        String fromMonth = fromMonthElements.getAttribute("value");
 
-        //from Year
-        WebDriverWait yearElement = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement fromYearElement = yearElement.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-        Select selectYear1 = new Select(fromYearElement);
-        selectYear1.selectByVisibleText(selectYear);
-        WebElement fromYearElements = driver.findElement(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']"));
-        String fromYear = fromYearElements.getAttribute("value");
-
-        //to Month
-        WebDriverWait montElement = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement toMonthElement = montElement.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-        Select selectMonth = new Select(toMonthElement);
-        selectMonth.selectByVisibleText(toSelectMonth);
-        WebElement toMonthElements = driver.findElement(By.xpath("//select[@class='ui-datepicker-month']//option[@selected='selected']"));
-        String toMonth = toMonthElements.getAttribute("value");
-
-        //to Year
-        WebDriverWait yearToElement = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement toYearElement = yearToElement.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-        Select toSelectYear1 = new Select(toYearElement);
-        toSelectYear1.selectByVisibleText(toSelectYear);
-        WebElement toYearElements = driver.findElement(By.xpath("//select[@class='ui-datepicker-year']//option[@selected='selected']"));
-        String toYear = toYearElements.getAttribute("value");
-
-
-        if (Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == 0 || Integer.parseInt(toYear) - Integer.parseInt(fromMonth) == 0) {
+        if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 0 || Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
             dateRangeInterviewPage();
-        } else if (Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == 1 && Integer.parseInt(toYear) - Integer.parseInt(fromYear) == 0) {
-            WebDriverWait defaultMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultElement = defaultMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select defaultMonth = new Select(defaultElement);
-            defaultMonth.selectByVisibleText(fromSelectMonth);
+        } else if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 1 && Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(fromSelectMonth);
 
             dateRangeInterviewPageDifferentMonth();
 
-            WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select nextMonth = new Select(nextMonthElement);
-            nextMonth.selectByVisibleText(toSelectMonth);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(toSelectMonth);
 
             toDateRangeInterviewPage();
-        } else if ((Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == -11) && (Integer.parseInt(toYear) - Integer.parseInt(fromYear) == 1)) {
-            WebDriverWait defaultMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultElement = defaultMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select defaultMonth = new Select(defaultElement);
-            defaultMonth.selectByVisibleText(fromSelectMonth);
+        } else if ((Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == -11) && (Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 1)) {
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(fromSelectMonth);
 
-            WebDriverWait defaultYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultYearElement = defaultYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select defaultYear = new Select(defaultYearElement);
-            defaultYear.selectByVisibleText(selectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(selectYear);
 
             dateRangeInterviewPageDifferentMonth();
 
-            WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select nextMonth = new Select(nextMonthElement);
-            nextMonth.selectByVisibleText(toSelectMonth);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(toSelectMonth);
 
-            WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select NextYear1 = new Select(nextYearElement);
-            NextYear1.selectByVisibleText(toSelectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(toSelectYear);
 
             toDateRangeInterviewPage();
-        } else if (Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == 2 && Integer.parseInt(toYear) - Integer.parseInt(fromYear) == 0) {
-            WebDriverWait defaultMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultElement = defaultMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select defaultMonth = new Select(defaultElement);
-            defaultMonth.selectByVisibleText(fromSelectMonth);
+        } else if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 2 && Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(fromSelectMonth);
 
-            WebDriverWait defaultYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultYearElement = defaultYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select defaultYear = new Select(defaultYearElement);
-            defaultYear.selectByVisibleText(selectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(selectYear);
 
             dateRangeInterviewPageDifferentMonth();
 
             //Click next Month Element
-            WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            secondElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
             completeMonthForInterviewPage();
 
-            WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select nextMonth = new Select(nextMonthElement);
-            nextMonth.selectByVisibleText(toSelectMonth);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(toSelectMonth);
 
             toDateRangeInterviewPage();
-        } else if (Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == 3 && Integer.parseInt(toYear) - Integer.parseInt(fromYear) == 0) {
-            WebDriverWait defaultMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultElement = defaultMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select defaultMonth = new Select(defaultElement);
-            defaultMonth.selectByVisibleText(fromSelectMonth);
+        } else if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 3 && Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(fromSelectMonth);
 
-            WebDriverWait defaultYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultYearElement = defaultYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select defaultYear = new Select(defaultYearElement);
-            defaultYear.selectByVisibleText(selectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(selectYear);
 
             dateRangeInterviewPageDifferentMonth();
 
             //Click next Month Element
-            WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            secondElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
             completeMonthForInterviewPage();
 
             //Click next Month Element
-            WebDriverWait thirdMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            thirdElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
             completeThirdMonthForInterviewPage();
 
-            WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select nextMonth = new Select(nextMonthElement);
-            nextMonth.selectByVisibleText(toSelectMonth);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(toSelectMonth);
 
             toDateRangeInterviewPage();
-        } else if (Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == 4 && Integer.parseInt(toYear) - Integer.parseInt(fromYear) == 0) {
-            WebDriverWait defaultMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultElement = defaultMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select defaultMonth = new Select(defaultElement);
-            defaultMonth.selectByVisibleText(fromSelectMonth);
+        } else if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 4 && Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(fromSelectMonth);
 
-            WebDriverWait defaultYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultYearElement = defaultYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select defaultYear = new Select(defaultYearElement);
-            defaultYear.selectByVisibleText(selectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(selectYear);
 
             dateRangeInterviewPageDifferentMonth();
 
             //Click next Month Element
-            WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            secondElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
             completeMonthForInterviewPage();
 
             //Click next Month Element
-            WebDriverWait thirdMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            thirdElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
             completeThirdMonthForInterviewPage();
 
             //Click next Month Element
-            WebDriverWait fourthMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement fourthElement = fourthMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            fourthElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
             completeFourthMonthForInterviewPage();
 
-            WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select nextMonth = new Select(nextMonthElement);
-            nextMonth.selectByVisibleText(toSelectMonth);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(toSelectMonth);
 
             toDateRangeInterviewPage();
-        } else if ((Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == -10) && (Integer.parseInt(toYear) - Integer.parseInt(fromYear) == 1)) {
-            WebDriverWait defaultMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultElement = defaultMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select defaultMonth = new Select(defaultElement);
-            defaultMonth.selectByVisibleText(fromSelectMonth);
+        } else if ((Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == -10) && (Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 1)) {
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(fromSelectMonth);
 
-            WebDriverWait defaultYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultYearElement = defaultYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select defaultYear = new Select(defaultYearElement);
-            defaultYear.selectByVisibleText(selectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(selectYear);
 
             dateRangeInterviewPageDifferentMonth();
 
             //Click next Month Element
-            WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            secondElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
-            WebDriverWait secondMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement second = secondMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonths = new Select(second);
-            WebElement textElement = secondMonths.getFirstSelectedOption();
-            String validateMonthElement = textElement.getText();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            webElement = month.getFirstSelectedOption();
+            String validateMonthElement = webElement.getText();
 
 
             if (!validateMonthElement.equals("Dec")) {
-                WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-                Select NextYear = new Select(nextYearElement);
-                NextYear.selectByVisibleText(toSelectYear);
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+                year = new Select(webElement);
+                year.selectByVisibleText(toSelectYear);
             }
 
             completeMonthForInterviewPage();
 
-            WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select nextMonth = new Select(nextMonthElement);
-            nextMonth.selectByVisibleText(toSelectMonth);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(toSelectMonth);
 
             toDateRangeInterviewPage();
-        } else if ((Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == -9) && (Integer.parseInt(toYear) - Integer.parseInt(fromYear) == 1)) {
-            WebDriverWait defaultMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultElement = defaultMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select defaultMonth = new Select(defaultElement);
-            defaultMonth.selectByVisibleText(fromSelectMonth);
+        } else if ((Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == -9) && (Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 1)) {
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(fromSelectMonth);
 
-            WebDriverWait defaultYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultYearElement = defaultYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select defaultYear = new Select(defaultYearElement);
-            defaultYear.selectByVisibleText(selectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(selectYear);
 
             dateRangeInterviewPageDifferentMonth();
 
             //Click next Month Element
-            WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            secondElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
-            WebDriverWait secondMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement second = secondMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonths = new Select(second);
-            WebElement textElement = secondMonths.getFirstSelectedOption();
-            String validateMonthElement = textElement.getText();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            select1 = new Select(webElement);
+            webElement = select1.getFirstSelectedOption();
+            String validateMonthElement = webElement.getText();
 
 
             if (!validateMonthElement.equals("Nov")) {
-                WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-                Select NextYear = new Select(nextYearElement);
-                NextYear.selectByVisibleText(toSelectYear);
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+                year = new Select(webElement);
+                year.selectByVisibleText(toSelectYear);
             }
 
             completeMonthForInterviewPage();
 
             //Click next Month Element
-            WebDriverWait thirdMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            thirdElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
-            WebDriverWait thirdMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement third = thirdMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select thirdMonths = new Select(third);
-            WebElement textThirdElement = thirdMonths.getFirstSelectedOption();
-            String validateThirdMonthElement = textThirdElement.getText();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            select1 = new Select(webElement);
+            webElement = select1.getFirstSelectedOption();
+            String validateThirdMonthElement = webElement.getText();
 
 
             if (!validateThirdMonthElement.equals("Dec")) {
-                WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-                Select NextYear = new Select(nextYearElement);
-                NextYear.selectByVisibleText(toSelectYear);
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+                year = new Select(webElement);
+                year.selectByVisibleText(toSelectYear);
             }
 
             completeThirdMonthForInterviewPage();
 
-            WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select nextMonth = new Select(nextMonthElement);
-            nextMonth.selectByVisibleText(toSelectMonth);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(toSelectMonth);
 
-            WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select NextYear = new Select(nextYearElement);
-            NextYear.selectByVisibleText(toSelectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(toSelectYear);
 
             toDateRangeInterviewPage();
-        } else if ((Integer.parseInt(toMonth) - Integer.parseInt(fromMonth) == -8) && (Integer.parseInt(toYear) - Integer.parseInt(fromYear) == 1)) {
-            WebDriverWait defaultMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultElement = defaultMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select defaultMonth = new Select(defaultElement);
-            defaultMonth.selectByVisibleText(fromSelectMonth);
+        } else if ((Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == -8) && (Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 1)) {
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(fromSelectMonth);
 
-            WebDriverWait defaultYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultYearElement = defaultYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select defaultYear = new Select(defaultYearElement);
-            defaultYear.selectByVisibleText(selectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(selectYear);
 
             dateRangeInterviewPageDifferentMonth();
 
             //Click next Month Element
-            WebDriverWait secondMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement secondElement = secondMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            secondElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
-            WebDriverWait secondMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement second = secondMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select secondMonths = new Select(second);
-            WebElement textElement = secondMonths.getFirstSelectedOption();
-            String validateMonthElement = textElement.getText();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            select1 = new Select(webElement);
+            webElement = select1.getFirstSelectedOption();
+            String validateMonthElement = webElement.getText();
 
 
             if (!validateMonthElement.equals("Oct")) {
-                WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-                Select NextYear = new Select(nextYearElement);
-                NextYear.selectByVisibleText(toSelectYear);
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+                year = new Select(webElement);
+                year.selectByVisibleText(toSelectYear);
             }
 
             completeMonthForInterviewPage();
 
             //Click next Month Element
-            WebDriverWait thirdMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement thirdElement = thirdMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            thirdElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
-            WebDriverWait thirdMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement third = thirdMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select thirdMonths = new Select(third);
-            WebElement textThirdElement = thirdMonths.getFirstSelectedOption();
-            String validateThirdMonthElement = textThirdElement.getText();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            select1 = new Select(webElement);
+            webElement = select1.getFirstSelectedOption();
+            String validateThirdMonthElement = webElement.getText();
 
 
             if (!validateThirdMonthElement.equals("Nov")) {
-                WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-                Select NextYear = new Select(nextYearElement);
-                NextYear.selectByVisibleText(toSelectYear);
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+                year = new Select(webElement);
+                year.selectByVisibleText(toSelectYear);
             }
 
             completeThirdMonthForInterviewPage();
 
             //Click next Month Element
-            WebDriverWait fourthMonthWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement fourthElement = fourthMonthWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
-            fourthElement.click();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
+            webElement.click();
 
-            WebDriverWait fourthMonth = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement fourth = fourthMonth.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select fourthMonths = new Select(fourth);
-            WebElement textFourthElement = fourthMonths.getFirstSelectedOption();
-            String validateFourthMonthElement = textFourthElement.getText();
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            select1 = new Select(webElement);
+            webElement = select1.getFirstSelectedOption();
+            String validateFourthMonthElement = webElement.getText();
 
 
             if (!validateFourthMonthElement.equals("Dec")) {
-                WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-                Select NextYear = new Select(nextYearElement);
-                NextYear.selectByVisibleText(toSelectYear);
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+                year = new Select(webElement);
+                year.selectByVisibleText(toSelectYear);
             }
 
             completeFourthMonthForInterviewPage();
 
-            WebDriverWait defaultMonthWaits = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextMonthElement = defaultMonthWaits.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            Select nextMonth = new Select(nextMonthElement);
-            nextMonth.selectByVisibleText(toSelectMonth);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+            month = new Select(webElement);
+            month.selectByVisibleText(toSelectMonth);
 
-            WebDriverWait nextYearWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement nextYearElement = nextYearWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            Select NextYear = new Select(nextYearElement);
-            NextYear.selectByVisibleText(toSelectYear);
+            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+            year = new Select(webElement);
+            year.selectByVisibleText(toSelectYear);
 
             toDateRangeInterviewPage();
         }
@@ -3015,13 +2811,13 @@ public class Main implements CommandLineRunner {
                     System.out.println("the Interview Page TimeStamp: {0}, This TimeStamp is selected." + timestamp);
                     System.out.println("the Interview Page date: {0}, This date is selected." + date);
                     System.out.println("the Interview Page state: {0}, This state is selected." + selectedState.getText());
-                    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(4));
-                    WebElement radioElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
-                    JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                    jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
-                    jsExecutor.executeScript("arguments[0].click();", radioElement);
+                    webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(4));
+                    webElement = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
+                    jsExecutor = (JavascriptExecutor) driver;
+                    jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
+                    jsExecutor.executeScript("arguments[0].click();", webElement);
                     driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                    playAudio("file_example_WAV_1MG.wav");
+                    playAudio("src/main/resources/file_example_WAV_1MG.wav");
                     throw new RuntimeException("The Interview Date is selected as " + date);
 
                 } catch (NoSuchElementException exception) {
@@ -3040,13 +2836,13 @@ public class Main implements CommandLineRunner {
                     System.out.println("the Interview Page date: {0}, This TimeStamp is selected." + date);
                     System.out.println("the Interview Page state: {0}, This TimeStamp is selected." + selectedState.getText());
 
-                    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(4));
-                    WebElement radioElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
-                    JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                    webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(4));
+                    WebElement radioElement = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
+                    jsExecutor = (JavascriptExecutor) driver;
                     jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                     jsExecutor.executeScript("arguments[0].click();", radioElement);
                     driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                    playAudio("file_example_WAV_1MG.wav");
+                    playAudio("src/main/resources/file_example_WAV_1MG.wav");
                     throw new RuntimeException("The Interview Date is selected as " + date);
                 } catch (NoSuchElementException exception) {
                     exception.getMessage();
@@ -3078,13 +2874,13 @@ public class Main implements CommandLineRunner {
                     System.out.println("the Interview Page date: {0}, This TimeStamp is selected." + date);
                     System.out.println("the Interview Page state: {0}, This TimeStamp is selected." + selectedState.getText());
 
-                    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(4));
-                    WebElement radioElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
-                        JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+                    webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(4));
+                    WebElement radioElement = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
+                        jsExecutor = (JavascriptExecutor) driver;
                         jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                         jsExecutor.executeScript("arguments[0].click();", radioElement);
                         driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                        playAudio("file_example_WAV_1MG.wav");
+                        playAudio("src/main/resources/file_example_WAV_1MG.wav");
                         throw new RuntimeException("The Interview Date is selected as " + date);
                 } catch (NoSuchElementException exception) {
                     exception.getMessage();
@@ -3100,13 +2896,13 @@ public class Main implements CommandLineRunner {
                     log.log(Level.INFO, "TimeStamp: {0}, This TimeStamp is selected." + timestamp);
                     log.log(Level.INFO, "Date: {0}, This Date is selected." + date);
                     log.log(Level.INFO, "Selected Sate: {0}, The Selected State is . " + selectedState.getText());
-                    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(4));
-                    WebElement radioElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
-                        JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                        jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
-                        jsExecutor.executeScript("arguments[0].click();", radioElement);
+                    webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(4));
+                    webElement = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
+                        jsExecutor = (JavascriptExecutor) driver;
+                        jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
+                        jsExecutor.executeScript("arguments[0].click();", webElement);
                         driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                        playAudio("file_example_WAV_1MG.wav");
+                        playAudio("src/main/resources/file_example_WAV_1MG.wav");
                         throw new RuntimeException("The Interview Date is selected as " + date);
 
                 } catch (NoSuchElementException exception) {
@@ -3131,13 +2927,13 @@ public class Main implements CommandLineRunner {
                 System.out.println("the Interview Page date: {0}, This TimeStamp is selected." + date);
                 System.out.println("the Interview Page state: {0}, This TimeStamp is selected." + selectedState.getText());
 
-                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-                WebElement radioElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
-                    JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-                    jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
-                    jsExecutor.executeScript("arguments[0].click();", radioElement);
+                webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                webElement = webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='radio']")));
+                    jsExecutor = (JavascriptExecutor) driver;
+                    jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
+                    jsExecutor.executeScript("arguments[0].click();", webElement);
                     driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                    playAudio("file_example_WAV_1MG.wav");
+                    playAudio("src/main/resources/file_example_WAV_1MG.wav");
                     throw new RuntimeException("The Interview Date is selected as " + date);
 
             } catch (NoSuchElementException exception) {
