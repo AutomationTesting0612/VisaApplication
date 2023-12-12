@@ -1031,13 +1031,20 @@ public class Main implements CommandLineRunner {
 
     public void selectDate() throws InterruptedException {
 
-        if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 0 || Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+        month = new Select(webElement);
+        month.selectByVisibleText(fromSelectMonth);
+
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+        year = new Select(webElement);
+        year.selectByVisibleText(selectYear);
+
+        if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 0 && Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
+
             dateRange();
         } else if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 1 && Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            month = new Select(webElement);
-            month.selectByVisibleText(fromSelectMonth);
 
             dateRange();
 
@@ -1048,15 +1055,6 @@ public class Main implements CommandLineRunner {
 
             toDateRange();
         } else if ((Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == -11) && (Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 1)) {
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            month = new Select(webElement);
-            month.selectByVisibleText(fromSelectMonth);
-
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            year = new Select(webElement);
-            year.selectByVisibleText(selectYear);
 
             dateRange();
 
@@ -1072,10 +1070,6 @@ public class Main implements CommandLineRunner {
 
             toDateRange();
         } else if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 2 && Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            month = new Select(webElement);
-            month.selectByVisibleText(fromSelectMonth);
 
             dateRange();
 
@@ -1084,6 +1078,8 @@ public class Main implements CommandLineRunner {
             webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[contains(text(),'Next')]")));
             webElement.click();
 
+            completeMonth();
+
             webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
             webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
             month = new Select(webElement);
@@ -1091,10 +1087,6 @@ public class Main implements CommandLineRunner {
 
             toDateRange();
         } else if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 3 && Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            month = new Select(webElement);
-            month.selectByVisibleText(fromSelectMonth);
 
             dateRange();
 
@@ -1152,15 +1144,6 @@ public class Main implements CommandLineRunner {
 
             toDateRange();
         } else if ((Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == -10) && (Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 1)) {
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            month = new Select(webElement);
-            month.selectByVisibleText(fromSelectMonth);
-
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            year = new Select(webElement);
-            year.selectByVisibleText(selectYear);
 
             dateRange();
 
@@ -1197,15 +1180,6 @@ public class Main implements CommandLineRunner {
 
             toDateRange();
         } else if ((Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == -9) && (Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 1)) {
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            month = new Select(webElement);
-            month.selectByVisibleText(fromSelectMonth);
-
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            year = new Select(webElement);
-            year.selectByVisibleText(selectYear);
 
             dateRange();
 
@@ -1220,7 +1194,7 @@ public class Main implements CommandLineRunner {
             webElement = month.getFirstSelectedOption();
             String validateMonthElement = webElement.getText();
 
-            if (!validateMonthElement.equals("Nov")) {
+            if (!validateMonthElement.equals("Dec")) {
                 webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
                 webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
                 year = new Select(webElement);
@@ -1261,15 +1235,6 @@ public class Main implements CommandLineRunner {
 
             toDateRange();
         } else if ((Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == -8) && (Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 1)) {
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement defaultElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            month = new Select(defaultElement);
-            month.selectByVisibleText(fromSelectMonth);
-
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            year = new Select(webElement);
-            year.selectByVisibleText(selectYear);
 
             dateRange();
 
@@ -2453,13 +2418,19 @@ public class Main implements CommandLineRunner {
 
     public void selectDateInterviewPage() throws InterruptedException {
 
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
+        month = new Select(webElement);
+        month.selectByVisibleText(fromSelectMonth);
+
+        webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
+        year = new Select(webElement);
+        year.selectByVisibleText(selectYear);
+
         if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 0 || Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
             dateRangeInterviewPage();
         } else if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 1 && Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            month = new Select(webElement);
-            month.selectByVisibleText(fromSelectMonth);
 
             dateRangeInterviewPageDifferentMonth();
 
@@ -2470,15 +2441,6 @@ public class Main implements CommandLineRunner {
 
             toDateRangeInterviewPage();
         } else if ((Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == -11) && (Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 1)) {
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            month = new Select(webElement);
-            month.selectByVisibleText(fromSelectMonth);
-
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            year = new Select(webElement);
-            year.selectByVisibleText(selectYear);
 
             dateRangeInterviewPageDifferentMonth();
 
@@ -2494,15 +2456,6 @@ public class Main implements CommandLineRunner {
 
             toDateRangeInterviewPage();
         } else if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 2 && Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            month = new Select(webElement);
-            month.selectByVisibleText(fromSelectMonth);
-
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            year = new Select(webElement);
-            year.selectByVisibleText(selectYear);
 
             dateRangeInterviewPageDifferentMonth();
 
@@ -2520,15 +2473,6 @@ public class Main implements CommandLineRunner {
 
             toDateRangeInterviewPage();
         } else if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 3 && Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            month = new Select(webElement);
-            month.selectByVisibleText(fromSelectMonth);
-
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            year = new Select(webElement);
-            year.selectByVisibleText(selectYear);
 
             dateRangeInterviewPageDifferentMonth();
 
@@ -2553,15 +2497,6 @@ public class Main implements CommandLineRunner {
 
             toDateRangeInterviewPage();
         } else if (Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == 4 && Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 0) {
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            month = new Select(webElement);
-            month.selectByVisibleText(fromSelectMonth);
-
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            year = new Select(webElement);
-            year.selectByVisibleText(selectYear);
 
             dateRangeInterviewPageDifferentMonth();
 
@@ -2593,15 +2528,6 @@ public class Main implements CommandLineRunner {
 
             toDateRangeInterviewPage();
         } else if ((Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == -10) && (Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 1)) {
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            month = new Select(webElement);
-            month.selectByVisibleText(fromSelectMonth);
-
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            year = new Select(webElement);
-            year.selectByVisibleText(selectYear);
 
             dateRangeInterviewPageDifferentMonth();
 
@@ -2633,15 +2559,6 @@ public class Main implements CommandLineRunner {
 
             toDateRangeInterviewPage();
         } else if ((Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == -9) && (Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 1)) {
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            month = new Select(webElement);
-            month.selectByVisibleText(fromSelectMonth);
-
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            year = new Select(webElement);
-            year.selectByVisibleText(selectYear);
 
             dateRangeInterviewPageDifferentMonth();
 
@@ -2699,15 +2616,6 @@ public class Main implements CommandLineRunner {
 
             toDateRangeInterviewPage();
         } else if ((Integer.parseInt(toSelectMonthDigitRange) - Integer.parseInt(selectMonthDigitRange) == -8) && (Integer.parseInt(toSelectYear) - Integer.parseInt(selectYear) == 1)) {
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-month']")));
-            month = new Select(webElement);
-            month.selectByVisibleText(fromSelectMonth);
-
-            webDriverWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            webElement = webDriverWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//select[@class='ui-datepicker-year']")));
-            year = new Select(webElement);
-            year.selectByVisibleText(selectYear);
 
             dateRangeInterviewPageDifferentMonth();
 
