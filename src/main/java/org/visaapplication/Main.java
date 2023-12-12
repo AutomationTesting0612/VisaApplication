@@ -32,7 +32,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 @SpringBootApplication
-@PropertySource("file:src/main/resources/application.properties")
+//@PropertySource("file:src/main/resources/application.properties")
+@PropertySource("file:application.properties")
 public class Main implements CommandLineRunner {
      WebDriver driver;
      Logger log = LogManager.getLogger(Main.class);
@@ -1387,7 +1388,7 @@ public class Main implements CommandLineRunner {
                         jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
                         jsExecutor.executeScript("arguments[0].click();", webElement);
                         driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                        playAudio("src/main/resources/file_example_WAV_1MG.wav");
+                        playAudio("file_example_WAV_1MG.wav");
                         selectStateConsularPosts();
 
                 } catch (NoSuchElementException exception) {
@@ -1413,7 +1414,7 @@ public class Main implements CommandLineRunner {
                     jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
                     jsExecutor.executeScript("arguments[0].click();", webElement);
                     driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                    playAudio("src/main/resources/file_example_WAV_1MG.wav");
+                    playAudio("file_example_WAV_1MG.wav");
                     selectStateConsularPosts();
 
                 } catch (NoSuchElementException exception) {
@@ -1457,7 +1458,7 @@ public class Main implements CommandLineRunner {
                     jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
                     jsExecutor.executeScript("arguments[0].click();", webElement);
                     driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                    playAudio("src/main/resources/file_example_WAV_1MG.wav");
+                    playAudio("file_example_WAV_1MG.wav");
                     selectStateConsularPosts();
             } catch (NoSuchElementException exception) {
                 exception.getMessage();
@@ -1497,7 +1498,7 @@ public class Main implements CommandLineRunner {
                 jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
                 jsExecutor.executeScript("arguments[0].click();", webElement);
                 driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                playAudio("src/main/resources/file_example_WAV_1MG.wav");
+                playAudio("file_example_WAV_1MG.wav");
                 throw new RuntimeException("The Interview Date is selected as " + date);
             } catch (NoSuchElementException exception) {
                 exception.getMessage();
@@ -1535,7 +1536,7 @@ public class Main implements CommandLineRunner {
                 jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
                 jsExecutor.executeScript("arguments[0].click();", webElement);
                 driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                playAudio("src/main/resources/file_example_WAV_1MG.wav");
+                playAudio("file_example_WAV_1MG.wav");
                 selectStateConsularPosts();
             } catch (NoSuchElementException exception) {
                 exception.getMessage();
@@ -1577,7 +1578,7 @@ public class Main implements CommandLineRunner {
                 jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
                 jsExecutor.executeScript("arguments[0].click();", webElement);
                 driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                playAudio("src/main/resources/file_example_WAV_1MG.wav");
+                playAudio("file_example_WAV_1MG.wav");
                 throw new RuntimeException("The Interview Date is selected as " + date);
 
             } catch (NoSuchElementException exception) {
@@ -1616,7 +1617,7 @@ public class Main implements CommandLineRunner {
                 jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                 jsExecutor.executeScript("arguments[0].click();", radioElement);
                 driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                playAudio("src/main/resources/file_example_WAV_1MG.wav");
+                playAudio("file_example_WAV_1MG.wav");
                 selectStateConsularPosts();
 
             } catch (NoSuchElementException exception) {
@@ -1657,7 +1658,7 @@ public class Main implements CommandLineRunner {
                 jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                 jsExecutor.executeScript("arguments[0].click();", radioElement);
                 driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                playAudio("src/main/resources/file_example_WAV_1MG.wav");
+                playAudio("file_example_WAV_1MG.wav");
                 throw new RuntimeException("The Interview Date is selected as " + date);
 
             } catch (NoSuchElementException exception) {
@@ -1695,7 +1696,7 @@ public class Main implements CommandLineRunner {
                 jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                 jsExecutor.executeScript("arguments[0].click();", radioElement);
                 driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                playAudio("src/main/resources/file_example_WAV_1MG.wav");
+                playAudio("file_example_WAV_1MG.wav");
                 selectStateConsularPosts();
             } catch (NoSuchElementException exception) {
                 exception.getMessage();
@@ -1726,7 +1727,7 @@ public class Main implements CommandLineRunner {
                     jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                     jsExecutor.executeScript("arguments[0].click();", radioElement);
                     driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                    playAudio("src/main/resources/file_example_WAV_1MG.wav");
+                    playAudio("file_example_WAV_1MG.wav");
                     selectStateConsularPosts();
 
             } catch (NoSuchElementException exception) {
@@ -2725,7 +2726,7 @@ public class Main implements CommandLineRunner {
                     jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
                     jsExecutor.executeScript("arguments[0].click();", webElement);
                     driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                    playAudio("src/main/resources/file_example_WAV_1MG.wav");
+                    playAudio("file_example_WAV_1MG.wav");
                     throw new RuntimeException("The Interview Date is selected as " + date);
 
                 } catch (NoSuchElementException exception) {
@@ -2750,7 +2751,7 @@ public class Main implements CommandLineRunner {
                     jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                     jsExecutor.executeScript("arguments[0].click();", radioElement);
                     driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                    playAudio("src/main/resources/file_example_WAV_1MG.wav");
+                    playAudio("file_example_WAV_1MG.wav");
                     throw new RuntimeException("The Interview Date is selected as " + date);
                 } catch (NoSuchElementException exception) {
                     exception.getMessage();
@@ -2788,7 +2789,7 @@ public class Main implements CommandLineRunner {
                         jsExecutor.executeScript("arguments[0].scrollIntoView(true);", radioElement);
                         jsExecutor.executeScript("arguments[0].click();", radioElement);
                         driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                        playAudio("src/main/resources/file_example_WAV_1MG.wav");
+                        playAudio("file_example_WAV_1MG.wav");
                         throw new RuntimeException("The Interview Date is selected as " + date);
                 } catch (NoSuchElementException exception) {
                     exception.getMessage();
@@ -2810,7 +2811,7 @@ public class Main implements CommandLineRunner {
                         jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
                         jsExecutor.executeScript("arguments[0].click();", webElement);
                         driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                        playAudio("src/main/resources/file_example_WAV_1MG.wav");
+                        playAudio("file_example_WAV_1MG.wav");
                         throw new RuntimeException("The Interview Date is selected as " + date);
 
                 } catch (NoSuchElementException exception) {
@@ -2841,7 +2842,7 @@ public class Main implements CommandLineRunner {
                     jsExecutor.executeScript("arguments[0].scrollIntoView(true);", webElement);
                     jsExecutor.executeScript("arguments[0].click();", webElement);
                     driver.findElement(By.xpath("//input[@id='submitbtn']")).click();
-                    playAudio("src/main/resources/file_example_WAV_1MG.wav");
+                    playAudio("file_example_WAV_1MG.wav");
                     throw new RuntimeException("The Interview Date is selected as " + date);
 
             } catch (NoSuchElementException exception) {
