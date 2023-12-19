@@ -198,7 +198,6 @@ public class Main implements CommandLineRunner {
             while (selectDataMet) {
                 select1.selectByVisibleText(selectState);
                 selectedState = select1.getFirstSelectedOption();
-                Thread.sleep(Long.parseLong(blankCalendarTimer));
                 webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                 selectedDate = webElement.getAttribute("value");
                 // Compare the current date with the target date
@@ -206,6 +205,7 @@ public class Main implements CommandLineRunner {
                     webElement.click();
                     if (!driver.findElement(By.xpath("//div[@id='ui-datepicker-div']")).isDisplayed()) {
                         webElement.click();
+                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                     }
                     selectDataMet = false;
                 } else if (selectedDate.equals("")){
@@ -238,11 +238,12 @@ public class Main implements CommandLineRunner {
                 } else if(selectedDate.equals("")) {
                     select1.selectByVisibleText(selectState1);
                     selectedState = select1.getFirstSelectedOption();
-                    Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                     webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                     selectedDate = webElement.getAttribute("value");
                     if (selectedDate.equals("Select Date")) {
                         webElement.click();
+                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         selectDataMet = false;
                     } else if (selectedDate.equals("")) {
                         selectDataMet = true;
@@ -278,11 +279,12 @@ public class Main implements CommandLineRunner {
                     } else if (selectedDate.equals("")) {
                         select2.selectByVisibleText(selectState);
                         selectedState = select2.getFirstSelectedOption();
-                        Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                         selectedDate = webElement.getAttribute("value");
                         if (selectedDate.equals("Select Date")) {
                             webElement.click();
+                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             selectDataMet2 = false;
                         } else if (selectedDate.equals("")) {
                             selectDataMet2 = true;
@@ -315,38 +317,42 @@ public class Main implements CommandLineRunner {
                 } else if(selectedDate.equals("")) {
                     select1.selectByVisibleText(selectState1);
                     selectedState = select1.getFirstSelectedOption();
-                    Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                     webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                     selectedDate = webElement.getAttribute("value");
                     if (selectedDate.equals("Select Date")) {
                         webElement.click();
+                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         selectDataMet = false;
                     } else if (selectedDate.equals("")) {
                         select1.selectByVisibleText(selectState2);
                         selectedState = select1.getFirstSelectedOption();
-                        Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                         selectedDate = webElement.getAttribute("value");
                         if (selectedDate.equals("Select Date")) {
                             webElement.click();
+                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             selectDataMet = false;
                         } else if (selectedDate.equals("")) {
                             select1.selectByVisibleText(selectState3);
                             selectedState = select1.getFirstSelectedOption();
-                            Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                             selectedDate = webElement.getAttribute("value");
                             if (selectedDate.equals("Select Date")) {
                                 webElement.click();
+                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 selectDataMet = false;
                             } else if (selectedDate.equals("")) {
                                 select1.selectByVisibleText(selectState4);
                                 selectedState = select1.getFirstSelectedOption();
-                                Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                                 selectedDate = webElement.getAttribute("value");
                                 if (selectedDate.equals("Select Date")) {
                                     webElement.click();
+                                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                                     selectDataMet = false;
                                 } else if (selectedDate.equals("")) {
                                     selectDataMet = true;
@@ -383,42 +389,46 @@ public class Main implements CommandLineRunner {
                     } else if (selectedDate.equals("")) {
                         select2.selectByVisibleText(selectState2);
                         selectedState = select2.getFirstSelectedOption();
-                        Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                         selectedDate = webElement.getAttribute("value");
 
                         if (selectedDate.equals("Select Date")) {
                             webElement.click();
+                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             selectDataMet2 = false;
                         } else if (selectedDate.equals("")) {
                             select2.selectByVisibleText(selectState3);
                             selectedState = select2.getFirstSelectedOption();
-                            Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                             selectedDate= webElement.getAttribute("value");
 
                             if (selectedDate.equals("Select Date")) {
                                 webElement.click();
+                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 selectDataMet2 = false;
                             } else if (selectedDate.equals("")) {
                                 select2.selectByVisibleText(selectState4);
                                 selectedState = select2.getFirstSelectedOption();
-                                Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                                 selectedDate = webElement.getAttribute("value");
 
                                 if (selectedDate.equals("Select Date")) {
                                     webElement.click();
+                                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                                     selectDataMet2 = false;
                                 } else if (selectedDate.equals("")) {
                                     select2.selectByVisibleText(selectState);
                                     selectedState = select2.getFirstSelectedOption();
-                                    Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                                     webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                                     selectedDate = webElement.getAttribute("value");
 
                                     if (selectedDate.equals("Select Date")) {
                                         webElement.click();
+                                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                                         selectDataMet2 = false;
                                     } else if (selectedDate.equals("")) {
                                         selectDataMet2 = true;
@@ -451,42 +461,47 @@ public class Main implements CommandLineRunner {
 
                     if (selectedDate.equals("Select Date")) {
                         webElement.click();
+                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         selectDataMet3 = false;
                     } else if (selectedDate.equals("")) {
                         select3.selectByVisibleText(selectState3);
                         selectedState = select3.getFirstSelectedOption();
-                        Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                         selectedDate = webElement.getAttribute("value");
                         if (selectedDate.equals("Select Date")) {
                             webElement.click();
+                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             selectDataMet3 = false;
                         } else if (selectedDate.equals("")) {
                             select3.selectByVisibleText(selectState4);
                             selectedState = select3.getFirstSelectedOption();
-                            Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                             selectedDate = webElement.getAttribute("value");
                             if (selectedDate.equals("Select Date")) {
                                 webElement.click();
+                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 selectDataMet3 = false;
                             } else if (selectedDate.equals("")) {
                                 select3.selectByVisibleText(selectState);
                                 selectedState = select3.getFirstSelectedOption();
-                                Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                                 selectedDate = webElement.getAttribute("value");
                                 if (selectedDate.equals("Select Date")) {
                                     webElement.click();
+                                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                                     selectDataMet3 = false;
                                 } else if (selectedDate.equals("")) {
                                     select3.selectByVisibleText(selectState1);
                                     selectedState = select3.getFirstSelectedOption();
-                                    Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                                     webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                                     selectedDate = webElement.getAttribute("value");
                                     if (selectedDate.equals("Select Date")) {
                                         webElement.click();
+                                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                                         selectDataMet3 = false;
                                     } else if (selectedDate.equals("")) {
                                         selectDataMet3 = true;
@@ -518,42 +533,47 @@ public class Main implements CommandLineRunner {
                     // Compare the current date with the target date
                     if (selectedDate.equals("Select Date")) {
                         webElement.click();
+                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         selectDataMet4 = false;
                     } else if (selectedDate.equals("")) {
                         select4.selectByVisibleText(selectState4);
                         selectedState = select4.getFirstSelectedOption();
-                        Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                         selectedDate = webElement.getAttribute("value");
                         if (selectedDate.equals("Select Date")) {
                             webElement.click();
+                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             selectDataMet4 = false;
                         } else if (selectedDate.equals("")) {
                             select4.selectByVisibleText(selectState);
                             selectedState = select4.getFirstSelectedOption();
-                            Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                             selectedDate = webElement.getAttribute("value");
                             if (selectedDate.equals("Select Date")) {
                                 webElement.click();
+                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 selectDataMet4 = false;
                             } else if (selectedDate.equals("")) {
                                 select4.selectByVisibleText(selectState1);
                                 selectedState = select4.getFirstSelectedOption();
-                                Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                                 selectedDate = webElement.getAttribute("value");
                                 if (selectedDate.equals("Select Date")) {
                                     webElement.click();
+                                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                                     selectDataMet4 = false;
                                 } else if (selectedDate.equals("")) {
                                     select4.selectByVisibleText(selectState2);
                                     selectedState = select4.getFirstSelectedOption();
-                                    Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                                     webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                                     selectedDate = webElement.getAttribute("value");
                                     if (selectedDate.equals("Select Date")) {
                                         webElement.click();
+                                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                                         selectDataMet4 = false;
                                     } else if (selectedDate.equals("")) {
                                         selectDataMet4 = true;
@@ -585,47 +605,52 @@ public class Main implements CommandLineRunner {
                     // Compare the current date with the target date
                     if (selectedDate.equals("Select Date")) {
                         webElement.click();
+                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         selectDataMet5 = false;
                     } else if (selectedDate.equals("")) {
                         select5.selectByVisibleText(selectState);
                         selectedState = select5.getFirstSelectedOption();
-                        Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                         selectedDate = webElement.getAttribute("value");
 
                         if (selectedDate.equals("Select Date")) {
                             webElement.click();
+                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             selectDataMet5 = false;
                         } else if (selectedDate.equals("")) {
                             select5.selectByVisibleText(selectState1);
                             selectedState = select5.getFirstSelectedOption();
-                            Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                             selectedDate = webElement.getAttribute("value");
 
                             if (selectedDate.equals("Select Date")) {
                                 webElement.click();
+                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 selectDataMet5 = false;
                             } else if (selectedDate.equals("")) {
 
                                 select5.selectByVisibleText(selectState2);
                                 selectedState = select5.getFirstSelectedOption();
-                                Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                                 selectedDate = webElement.getAttribute("value");
 
                                 if (selectedDate.equals("Select Date")) {
                                     webElement.click();
+                                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                                     selectDataMet5 = false;
                                 } else if (selectedDate.equals("")) {
                                     select5.selectByVisibleText(selectState3);
                                     selectedState = select5.getFirstSelectedOption();
-                                    Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                                     webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                                     selectedDate = webElement.getAttribute("value");
 
                                     if (selectedDate.equals("Select Date")) {
                                         webElement.click();
+                                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                                         selectDataMet5 = false;
                                     } else if (selectedDate.equals("")) {
                                         selectDataMet5 = true;
@@ -657,36 +682,40 @@ public class Main implements CommandLineRunner {
 
                 if (selectedDate.equals("Select Date")) {
                     webElement.click();
+                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                     selectDataMet = false;
                 } else if(selectedDate.equals("")) {
                     select1.selectByVisibleText(selectState1);
                     selectedState = select1.getFirstSelectedOption();
-                    Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                     webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                     selectedDate = webElement.getAttribute("value");
 
                     if (selectedDate.equals("Select Date")) {
                         webElement.click();
+                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         selectDataMet = false;
                     } else if(selectedDate.equals("")) {
                         select1.selectByVisibleText(selectState2);
                         selectedState = select1.getFirstSelectedOption();
-                        Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         WebElement calendar3 = driver.findElement(By.xpath("//input[@id='datepicker']"));
                         selectedDate = calendar3.getAttribute("value");
 
                         if (selectedDate.equals("Select Date")) {
                             calendar3.click();
+                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             selectDataMet = false;
                         } else if(selectedDate.equals("")) {
                             select1.selectByVisibleText(selectState3);
                             selectedState = select1.getFirstSelectedOption();
-                            Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                             selectedDate = webElement.getAttribute("value");
 
                             if (selectedDate.equals("Select Date")) {
                                 webElement.click();
+                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 selectDataMet = false;
                             } else if (selectedDate.equals("")) {
                                 selectDataMet = true;
@@ -719,36 +748,40 @@ public class Main implements CommandLineRunner {
                     // Compare the current date with the target date
                     if (selectedDate.equals("Select Date")) {
                         webElement.click();
+                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         selectDataMet2 = false;
                     } else if (selectedDate.equals("")) {
                         select2.selectByVisibleText(selectState2);
                         selectedState = select2.getFirstSelectedOption();
-                        Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                         selectedDate = webElement.getAttribute("value");
 
                         if (selectedDate.equals("Select Date")) {
                             webElement.click();
+                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             selectDataMet2 = false;
                         } else if (selectedDate.equals("")) {
                             select2.selectByVisibleText(selectState3);
                             selectedState = select2.getFirstSelectedOption();
-                            Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                             selectedDate = webElement.getAttribute("value");
 
                             if (selectedDate.equals("Select Date")) {
                                 webElement.click();
+                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 selectDataMet2 = false;
                             } else if (selectedDate.equals("")) {
                                 select2.selectByVisibleText(selectState);
                                 selectedState = select2.getFirstSelectedOption();
-                                Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                                 selectedDate = webElement.getAttribute("value");
 
                                 if (selectedDate.equals("Select Date")) {
                                     webElement.click();
+                                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                                     selectDataMet2 = false;
                                 } else if (selectedDate.equals("")) {
                                     selectDataMet2 = true;
@@ -780,36 +813,40 @@ public class Main implements CommandLineRunner {
 
                     if (selectedDate.equals("Select Date")) {
                         webElement.click();
+                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         selectDataMet3 = false;
                     } else if (selectedDate.equals("")) {
                         select3.selectByVisibleText(selectState3);
                         selectedState = select3.getFirstSelectedOption();
-                        Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                         selectedDate = webElement.getAttribute("value");
 
                         if (selectedDate.equals("Select Date")) {
                             webElement.click();
+                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             selectDataMet3 = false;
                         } else if (selectedDate.equals("")) {
                             select3.selectByVisibleText(selectState);
                             selectedState = select3.getFirstSelectedOption();
-                            Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                             selectedDate = webElement.getAttribute("value");
 
                             if (selectedDate.equals("Select Date")) {
                                 webElement.click();
+                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 selectDataMet3 = false;
                             } else if (selectedDate.equals("")) {
                                 select3.selectByVisibleText(selectState1);
                                 selectedState = select3.getFirstSelectedOption();
-                                Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                                 selectedDate = webElement.getAttribute("value");
 
                                 if (selectedDate.equals("Select Date")) {
                                     webElement.click();
+                                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                                     selectDataMet3 = false;
                                 } else if (selectedDate.equals("")) {
 
@@ -842,36 +879,40 @@ public class Main implements CommandLineRunner {
                     // Compare the current date with the target date
                     if (selectedDate.equals("Select Date")) {
                         webElement.click();
+                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         selectDataMet4 = false;
                     } else if (selectedDate.equals("")) {
                         select4.selectByVisibleText(selectState);
                         selectedState = select4.getFirstSelectedOption();
-                        Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                         selectedDate = webElement.getAttribute("value");
 
                         if (selectedDate.equals("Select Date")) {
                             webElement.click();
+                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             selectDataMet4 = false;
                         } else if (selectedDate.equals("")) {
                             select4.selectByVisibleText(selectState1);
                             selectedState = select4.getFirstSelectedOption();
-                            Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                             selectedDate = webElement.getAttribute("value");
 
                             if (selectedDate.equals("Select Date")) {
                                 webElement.click();
+                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 selectDataMet4 = false;
                             } else if (selectedDate.equals("")) {
                                 select4.selectByVisibleText(selectState2);
                                 selectedState = select4.getFirstSelectedOption();
-                                Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                                 selectedDate = webElement.getAttribute("value");
 
                                 if (selectedDate.equals("Select Date")) {
                                     webElement.click();
+                                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                                     selectDataMet4 = false;
                                 } else if (selectedDate.equals("")) {
                                     selectDataMet4 = true;
@@ -903,22 +944,25 @@ public class Main implements CommandLineRunner {
                 selectedDate = webElement.getAttribute("value");
                 if (selectedDate.equals("Select Date")) {
                     webElement.click();
+                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                     selectDataMet = false;
                 } else if (selectedDate.equals("")) {
                     select1.selectByVisibleText(selectState1);
-                    Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                    Thread.sleep(Long.parseLong(blankCalendarTimer));
                     webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                     selectedDate = webElement.getAttribute("value");
                     if (selectedDate.equals("Select Date")) {
                         webElement.click();
+                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         selectDataMet = false;
                     } else if (selectedDate.equals("")) {
                         select1.selectByVisibleText(selectState2);
-                        Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                         selectedDate = webElement.getAttribute("value");
                         if (selectedDate.equals("Select Date")) {
                             webElement.click();
+                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             selectDataMet = false;
                         } else if (selectedDate.equals("")) {
                             selectDataMet = true;
@@ -949,22 +993,25 @@ public class Main implements CommandLineRunner {
                     // Compare the current date with the target date
                     if (selectedDate.equals("Select Date")) {
                         webElement.click();
+                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         selectDataMet2 = false;
                     } else if (selectedDate.equals("")) {
                         select2.selectByVisibleText(selectState2);
-                        Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                         selectedDate = webElement.getAttribute("value");
                         if (selectedDate.equals("Select Date")) {
                             webElement.click();
+                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             selectDataMet2 = false;
                         } else if (selectedDate.equals("")) {
                             select2.selectByVisibleText(selectState);
-                            Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                             selectedDate = webElement.getAttribute("value");
                             if (selectedDate.equals("Select Date")) {
                                 webElement.click();
+                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 selectDataMet2 = false;
                             } else if (selectedDate.equals("")) {
                                 selectDataMet2 = true;
@@ -994,24 +1041,27 @@ public class Main implements CommandLineRunner {
 
                     if (selectedDate.equals("Select Date")) {
                         webElement.click();
+                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         selectDataMet3 = false;
                     } else if (selectedDate.equals("")) {
                         select3.selectByVisibleText(selectState);
-                        Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                        Thread.sleep(Long.parseLong(blankCalendarTimer));
                         webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                         selectedDate = webElement.getAttribute("value");
 
                         if (selectedDate.equals("Select Date")) {
                             webElement.click();
+                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             selectDataMet3 = false;
                         } else if (selectedDate.equals("")) {
                             select3.selectByVisibleText(selectState1);
-                            Thread.sleep(Long.parseLong(blankCalendarTimer));
+//                            Thread.sleep(Long.parseLong(blankCalendarTimer));
                             webElement = driver.findElement(By.xpath("//input[@id='datepicker']"));
                             selectedDate = webElement.getAttribute("value");
 
                             if (selectedDate.equals("Select Date")) {
                                 webElement.click();
+                                Thread.sleep(Long.parseLong(blankCalendarTimer));
                                 selectDataMet3 = false;
                             } else if (selectedDate.equals("")) {
                                 selectDataMet3 = true;
